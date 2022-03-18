@@ -1,0 +1,3903 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" contents="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Annotation Tool</title>
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css" integrity="sha384-3B6NwesSXE7YJlcLI9RpRqGf2p/EgVH8BgoKTaUrmKNDkHPStTQ3EyoYjCGXaOTS" crossorigin="anonymous">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fnts.googleapis.com/css2?family=Kumbh+Sans:wght@400;700&display=swap" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.7.570/build/pdf.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+            integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/konva/8.3.3/konva.min.js"
+            integrity="sha512-HMeFo4s9YU41M2F2PRrYsEwgwgQWUAMSQzDLm0RYJPu2dAXBaUmCcYTEc8GEVTS9kKnclBYyRs8nU0RRoQBJ3w=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script type="module" src="https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js"></script>
+        <script type="module" src="https://www.gstatic.com/firebasejs/9.6.8/firebase-auth.js"></script>
+        <style>
+
+            body {
+                height: auto;
+                width: auto;
+                font-family: 'Kumbh Sans', sans-serif;
+                background-color: #3a3a3a;
+            }
+
+
+            #header-toolbar-container {
+                width: auto;
+                margin: 0px auto;
+                padding: 10px;
+                background-color:#111;
+            }
+
+            #header-toolbar {
+                width: auto;
+                margin: 0px auto;
+                padding: 10px;
+                display: flex;
+                color: #ff0844;
+            }
+
+            #nav-toolbar {
+                margin: 0px auto 0px 0px;
+            }
+
+            #sharing-toolbar {
+                margin: 0px 0px 0px auto;
+            }
+
+            .header-toolbar-item {
+                width: auto;
+                display: inline-block;
+            }
+
+            .tool-function,
+            .tool-sharing,
+            .tool-nav {
+                width: auto;
+                display: inline-block;
+            }
+
+            #book-info-container {
+                width: auto;
+                margin: 0px auto;
+                padding: 10px;
+                background-color: #111;
+                color: white;
+                font-size: 30px;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+
+            #book-info {
+                width: auto;
+                margin: 0px auto;
+                padding: 10px;
+                background-color: #ff8177;
+                background-image: linear-gradient(to top, #ff0844 0%, #ffb199 100%);
+                background-size: 100%;
+                -webkit-background-clip: text;
+                -moz-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                -moz-text-fill-color: transparent;
+                font-size: 30px;
+                color: #ff0844;
+                border-style: groove;
+                border-radius: 6px;
+            }
+
+            .book-info-subcontainer {
+                width: auto;
+                text-align: center;
+                margin: 5px;
+                padding: 10px;
+            }
+
+            #book-title {
+                font-weight: bold;
+                font-size: 25px;
+            }
+
+            #book-author, #book-publication {
+              font-size: 20px;
+            }
+
+            #book-page-navigation {
+                width: auto;
+                margin: 0 auto;
+                text-align: center;
+                padding: 10px;
+                background-color: #111;
+                color: white;
+                align-content: center;
+                align-items: center;
+            }
+
+            #book-page-navigation-container {
+                width: fit-content;
+                margin: 0px auto;
+                border-width: auto;
+                padding: 10px;
+                color: #ff0844;
+                border-style: groove;
+                border-radius: 6px;
+            }
+
+            .page-nav-function-container {
+                width: auto;
+                margin: 0px auto;
+                margin: 5px;
+                padding: 10px;
+                text-align: center;
+                align-content: center;
+            }
+
+            #page-number-input {
+                width: 60px;
+                color: #ff0844;
+            }
+
+            #bookmarking-toolbar {
+                text-align: right;
+            }
+
+            .bookmark-function {
+                width: auto;
+                display: inline-block;
+                overflow: hidden;
+            }
+
+            #bookmark-popup-form-container {
+                display: none;
+                position:absolute;
+                background-color: #111;
+                color: white;
+                max-width: 200px;
+                border-style: solid;
+                border-color: white;
+                padding: 7px;
+                margin-top: 13px;
+                border-radius: 10px;
+            }
+
+            #bookmark-form-label-input-container {
+              text-align: left;
+              padding-top: 5px;
+            }
+
+            #bookmark-form-buttons-container {
+              padding-top: 5px;
+              display: flex;
+            }
+
+            #input-bookmark-name{
+                color: black;
+                font-size: 14px;
+                width: 200px;
+                align-items: center;
+                text-align: center;
+                margin-left: -4px;
+            }
+
+            #create-edit-bookmark, #remove-cancel-bookmark {
+              width: 100%;
+              padding: 5px 20px;
+              cursor: pointer;
+              display: block;
+              margin: 5px;
+              background: linear-gradient(to top, #ff0844 0%, #ffb199 100%);
+              border: 0;
+              outline: none;
+              border-radius: 30px;
+              align-items: center;
+              text-align: center;
+              padding: 10px;
+              margin-bottom: 10px;
+              border-radius: 12px;
+              margin: 5px 5px auto auto;
+            }
+
+            .document-page-nav-button{
+              width: %;
+              padding: 5px 20px;
+              cursor: pointer;
+              margin: 5px;
+              background: linear-gradient(to top, #ff0844 0%, #ffb199 100%);
+              border: 0;
+              outline: none;
+              border-radius: 1px;
+              align-items: center;
+              text-align: center;
+              justify:center;
+              margin: 5px auto;
+            }
+
+            #bookmark-list-header {
+              margin-left: 5px;
+              color: #ff0844;
+            }
+
+            #bookmark-popup-list-container {
+                display: none;
+                position: absolute;
+                background-color: #111;
+                text-align: left;
+                color: white;
+                max-width: 200px;
+                border-style: solid;
+                border-color: white;
+                padding: 7px;
+                margin-top: 13px;
+                border-radius: 10px;
+                overflow-y: auto;
+                max-height: 500px;
+                margin-right: -5px;
+            }
+
+            #existing-bookmark-unordered-list {
+              list-style: none;
+              margin-left:-40px;
+            }
+
+            .existing-bookmark-unordered-list-item {
+              padding-top: 10px;
+            }
+
+            #bookmark-button {
+                text-align: center;
+                padding-top: 5px;
+            }
+
+            .bookmark-list-items-button {
+              width: 200px;
+              text-align: left;
+              cursor: pointer;
+              background-color: #111;
+              border: white;
+              border-style:solid;
+              border-radius: 10px;
+              border-width: 1px;
+              color: white;
+            }
+
+            #nav-bookmarked-pages {
+                text-align: center;
+                padding-top: 5px;
+            }
+
+            /*Do not change display, width or margin*/
+            #canvas-container {
+                width: auto;
+                margin: 0px auto;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                padding: 10px;
+                background-color: #111;
+                display: flex;
+            }
+
+            /*Do not change attributes*/
+            #canvas-area {
+                margin: 0px auto;
+            }
+            /*Do not change attributes*/
+            #pdf-displaying-canvas-container {
+              position: relative;
+              width: 497px;
+            }
+            /*Do not change attributes*/
+            #the-canvas {
+                border: 1px solid black;
+                position: absolute;top: 0;
+                left: 0;
+            }
+
+            #object-attribute-editing-toolbar-container, #annotation-function-toolbar, #annotations-toggle-container,
+            #bookmarking-toolbar-container-temp, #zoom-toolbar-container-temp {
+                padding: 7px;
+            }
+
+            #shapeDropdownList, .attribute-dropdown-content {
+                display: none;
+                position: absolute;
+                background-color: #f1f1f1;
+                min-width: 80px;
+                overflow: auto;
+                box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+                z-index: 1;
+            }
+
+            .shape-item, .attribute-item {
+                color: black;
+                padding: 12px 16px;
+                text-decoration: none;
+                display: block;
+            }
+
+            a :hover {background-color: #ddd;}
+
+            .attribute-function {
+                display: inline-block;
+            }
+
+            /* Annotation list design */
+            #annotation-list-container {
+                width: 290px;
+                border-style: groove;
+                border-radius: 6px;
+                border-width: auto;
+                display: absolute;
+                overflow: hidden;
+                color: white;
+                max-height: 634px;
+            }
+
+            #annotation-list-temp-container {
+              overflow-y: auto;
+              max-height: 500px;
+              margin-right: -20px;
+            }
+
+            #annotation-list-header-container {
+                text-align: center;
+                padding: 5px;
+                color: white;
+            }
+
+            #annotation-list-header {
+                font-size: 22px;
+                font-weight: bold;
+                color: white;
+            }
+
+            .annotation-preview-container {
+                border-style: solid;
+                border-radius: 6px;
+                border-width: auto;
+                margin: 5px 10px 10px 10px;
+                color: white;
+            }
+
+            .annotation-preview-name-container, .annotation-preview-author-container, .annotation-preview-date-container,
+            #annotation-instance-name-container, #annotation-instance-desc-container, #annotation-instance-author-container,
+            #annotation-instance-name-input-container, #annotation-instance-desc-input-container  {
+                text-align: left;
+                padding: 5px;
+                color: white;
+            }
+            .annotation-preview-author-container {
+                margin-top: 5px;
+            }
+            .annotation-preview-name, #annotation-instance-name {
+                font-size: 18px;
+            }
+            .annotation-preview-author, .annotation-preview-date {
+                font-size: 14px;
+            }
+
+            #annotation-instance-name-container {
+              margin-top: 17px;
+            }
+
+            #annotation-instance-author-container, #annotation-instance-desc-container {
+              border-bottom: groove;
+            }
+
+            #annotation-instance-author {
+              font-size: 16px;
+            }
+
+            #annotation-instance-desc {
+              font-size: 14px;
+            }
+
+            #annotations-toggle-container {
+                text-align: right;
+                margin: 0px 0px 0px auto;
+            }
+
+            #open-annotations-sidebar-button {
+                font-size: 23px;
+                cursor: pointer;
+                background-color: #111;
+                color: white;
+                border:none;
+                text-align: left;
+                padding: 5px;
+            }
+
+            #annotation-instance-container {
+                border-style: groove;
+                border-radius: 6px;
+                border-width: auto;
+                display: block;
+                padding: 7px;
+            }
+
+            .annotation-instance-ribbon-button, #filter-to-all-my-annotations-button,
+            #annotation-instance-desc-display-button, #add-new-annotation-button{
+              height: 35px;
+              width: auto;
+              cursor: pointer;
+              background-color: #111;
+              border: none;
+              color: white;
+              font-size: medium;
+            }
+
+            #bookmark-button, #nav-bookmarked-pages {
+              width: auto;
+              cursor: pointer;
+              background-color: #111;
+              border: none;
+              color: white;
+            }
+
+            .toolbar-buttons {
+              height: 41px;
+              width: auto;
+              cursor: pointer;
+              background-color: #111;
+              border: none;
+              color: white;
+              font-size: medium;
+            }
+
+            #temp-attribute-functions-container-other-shapes, #annotation-function-toolbar-temp-container {
+              border-left-style: groove;
+              border-left-color: white;
+              border-right-style: groove;
+              border-right-color: white;
+              padding-left: 1.5px;
+              padding-right: 1.5px;
+              margin-left: 1.5px;
+              margin-right: 1.5px;
+            }
+
+            #bookmarking-toolbar-container, #function-toolbar, #annotations-temp-toggle-container {
+              padding-left: 1.5px;
+              padding-right: 1.5px;
+              margin-left: 1.5px;
+              margin-right: 1.5px;
+            }
+
+            .attribute-buttons {
+              height: 35px;
+              width: auto;
+              cursor: pointer;
+              background-color: #111;
+              border: none;
+              color: white;
+              font-size: medium;
+            }
+
+
+            .bookmark-list-items-button:hover, #open-annotations-sidebar-button:hover,
+            #bookmark-button, #nav-bookmarked-pages, .toolbar-buttons:hover {
+              color: #f77062;
+              transition: all .02s ease;
+            }
+
+            #edit-font-family, #edit-font-size, #edit-font-style,
+            #edit-stroke-color, #edit-stroke-width, #edit-fill-color,
+            #edit-opacity {
+              height: 41px;
+              width: auto;
+              cursor: pointer;
+              background-color: #111;
+              border: none;
+              color: white;
+            }
+
+            #annotation-instance-desc-display-button-container {
+              margin-top: 10px;
+            }
+
+            #annotation-instance-desc-input-container,  #annotation-instance-desc-input {
+              height: auto;
+            }
+
+            /*Do not change display or justify-content attributes*/
+            #main-toolbar {
+              display: flex;
+              text-align: center;
+              background-color: #111;
+            }
+
+            #zoom-in-out-bookmarking-toolbar-container {
+              display: flex;
+              margin: 0px auto 0px 0px;
+            }
+
+            #toolbar {
+              display: flex;
+              background: #111;
+            }
+
+            /* Random stuff needed for the nav bar */
+            .navbar {
+                background: #131313;
+                height: 80px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 1.2rem;
+                position: sticky;
+                z-index: 999;
+            }
+
+            .navbar__container {
+                display: flex;
+                justify-content: space-between;
+                z-index: 1;
+                max-width: 1300px;
+                margin: 0 auto;
+                padding: 0 50px;
+                text-align: center;
+            }
+
+            #navbar__logo{
+                background-color: #ff8177;
+                background-image: linear-gradient(to top, #ff0844 0%, #ffb199 100%);
+                background-size: 100%;
+                -webkit-background-clip: text;
+                -moz-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                -moz-text-fill-color: transparent;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+                text-decoration: none;
+                font-size: 2.5rem;
+            }
+
+            .fa-gem{
+                margin-right: .5rem;
+            }
+
+            .navbar_menu {
+                display: flex;
+            }
+
+            .navbar__menu{
+                display: flex;
+                align-items: center;
+                list-style: none;
+                text-align: center;
+            }
+
+            .navbar__item {
+                height: 80px;
+            }
+        </style>
+    </head>
+
+    <body id="body">
+        <div id="header-toolbar-container">
+            <div id="header-toolbar">
+                <div id="nav-toolbar" class="header-toolbar-item">
+                    <div class="tool-nav">
+                        <button id="to-libary-page" class="toolbar-buttons">Library</button>
+                    </div>
+                    <div class="tool-nav">
+                        <button id="nav-recent-books" class="toolbar-buttons">Recent Books</button>
+                    </div>
+                </div>
+
+
+                <div class="navbar__container">
+                    <a href="Frontpage.html" id="navbar__logo"><i class="fa-regular fa-note-sticky"></i> Shared Annotations</a>
+                </div>
+
+
+                <div id="sharing-toolbar" class="header-toolbar-item">
+                    <div class="tool-sharing">
+                        <button id="share-book" class="toolbar-buttons">Share</button>
+                    </div>
+                    <div class="tool-sharing">
+                        <button id="manage-users" class="toolbar-buttons">Manage</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="book-info-container">
+            <div id="book-info">
+                <div class="book-info-subcontainer">
+                    <span id="book-title">Book Title</span>
+                </div>
+                <div class="book-info-subcontainer">
+                    <span id="book-author">Book Author</span>
+                    <span class="seperator"> - </span>
+                    <span id="book-publication">Publication Year</span>
+                </div>
+            </div>
+        </div>
+        <div id="toolbar">
+          <div id="zoom-in-out-bookmarking-toolbar-container">
+              <div id="bookmarking-toolbar-container-temp">
+                <div id="bookmarking-toolbar-container">
+                    <div id="bookmarking-toolbar">
+                        <div class="bookmark-function">
+                            <button id="bookmark-button" type="button">
+                                <img id="bookmark-icon" src="non_bookmark_icon.png" alt="Bookmark">
+                            </button>
+                            <button id="nav-bookmarked-pages" type="button">
+                                <img id="bookmark-list-icon" src="bookmark_list_down_arrow.png" alt="Bookmark List">
+                            </button>
+                            <div id="bookmark-popup-form-container">
+                                <form class="bookmark-popup-form">
+                                  <div id="bookmark-form-label-input-container">
+                                    <label for="name"><strong>Name</strong></label>
+                                    <input id="input-bookmark-name" type="text" placeholder="Please enter a bookmark name" name="name" required>
+                                  </div>
+                                  <div id="bookmark-form-buttons-container">
+                                    <button id="create-edit-bookmark" type="button">Done</button>
+                                    <button id="remove-cancel-bookmark" type="button">Cancel</button>
+                                  </div>
+                                </form>
+                            </div>
+                            <div id="bookmark-popup-list-container">
+                                <h3 id="bookmark-list-header">My Bookmarks</h3>
+                                <ul id="existing-bookmark-unordered-list">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+              </div>
+            </div>
+            <div id="zoom-toolbar-container-temp">
+              <div id="function-toolbar" class="header-toolbar-item">
+                  <div class="tool-function">
+                      <button id="zoom-in" class="toolbar-buttons" type="button">Zoom In</button>
+                  </div>
+                  <div class="tool-function">
+                      <button id="zoom-out" class="toolbar-buttons" type="button">Zoom Out</button>
+                  </div>
+              </div>
+            </div>
+          </div>
+          <div id="main-toolbar">
+            <div id="annotation-function-toolbar" class="header-toolbar-item">
+              <div id="annotation-function-toolbar-temp-container">
+                <div class="tool-function">
+                    <button id="add-shape" class="toolbar-buttons">Shapes</button>
+                    <div id="shapeDropdownList" class="dropdown-content" display="none">
+                        <a class="shape-item">Rectangle</a>
+                        <a class="shape-item">Circle</a>
+                        <a class="shape-item">Arrow</a>
+                        <a class="shape-item">Line</a>
+                        <a class="shape-item">Triangle</a>
+                        <a class="shape-item">Star</a>
+                    </div>
+                </div>
+                <div class="tool-function">
+                    <button id="add-text-box" class="toolbar-buttons">Text Box</button>
+                </div>
+                <div class="tool-function">
+                    <label id="imageInputLabel" for="add-image" class="toolbar-buttons" >Image</label>
+                    <input type="file" id="add-image" onchange="getImageFromFile(this);" class="toolbar-buttons" accept=".jpg, .jpeg, .png" style="display:none;">
+                </div>
+                <div class="tool-function">
+                    <button id="highlight" class="toolbar-buttons">Highlight</button>
+                </div>
+                <div class="tool-function">
+                    <button id="delete-object" class="toolbar-buttons">Delete</button>
+                </div>
+                <div class="tool-function">
+                    <button id="undo" class="toolbar-buttons">Undo</button>
+                </div>
+                <div class="tool-function">
+                    <button id="redo" class="toolbar-buttons">Redo</button>
+                </div>
+                <div class="tool-function">
+                    <button id="clear" class="toolbar-buttons">Clear</button>
+                </div>
+              </div>
+            </div>
+            <div id="object-attribute-editing-toolbar-container">
+            </div>
+          </div>
+          <div id="annotations-toggle-container">
+            <div id="annotations-temp-toggle-container">
+              <button id="open-annotations-sidebar-button">☰</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="canvas-container">
+            <div id="canvas-area">
+              <div id="pdf-displaying-canvas-container">
+                <canvas id="the-canvas"></canvas>
+              </div>
+              <div id="annotating-canvas"></div>
+            </div>
+            <div id="annotation-list-container">
+                <div id="annotation-list-header-container">
+                    <span id="annotation-list-header">All Annotations</span>
+                </div>
+                <div id="annotation-list-header-container">
+                    <button id="filter-to-all-my-annotations-button" class="annotation-list-filter-button">↻ My Annotations</button>
+                    <button id="add-new-annotation-button">Add Annotation</button>
+                </div>
+            </div>
+            <div id="annotation-instance-container">
+                <div id="annotation-instance-buttons-ribbon">
+                    <button id="annotation-instance-back-button" class="annotation-instance-ribbon-button">Back</button>
+                    <button id="annotation-instance-view-edit-toggle-button" class="annotation-instance-ribbon-button">Edit Annotation</button>
+                    <button id="annotation-instance-delete-button" class="annotation-instance-ribbon-button">Delete Annotation</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="book-page-navigation">
+            <div id="book-page-navigation-container">
+                <div id="page-number-container" class="page-nav-function-container">
+                    <span>Page:</span>
+                    <input id="page-num" type="number" value="1" min="1">
+                    <span>/</span>
+                    <span id="page-count"></span>
+                    <button id="go-to-page" class="document-page-nav-button">
+                        <span id="icon-go">Go</span>
+                    </button>
+                </div>
+                <div id="page-buttons-container" class="page-nav-function-container">
+                    <button id="previous-page" class="document-page-nav-button">
+                        <span id="icon-previous">Previous</span>
+                    </button>
+                    <button id="next-page" class="document-page-nav-button">
+                        <span id="icon-next">Next</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <script type="module" src="https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js"></script>
+        <script id="firebase" type="module">
+          // Import the functions you need from the SDKs you need
+          import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js";
+          // TODO: Add SDKs for Firebase products that you want to use
+          // https://firebase.google.com/docs/web/setup#available-libraries
+
+          // Your web app's Firebase configuration
+          const firebaseConfig = {
+            apiKey: "AIzaSyCHwSE4QWh7awhGmHK4kDu2BEiAErlVl9g",
+            authDomain: "project-7021442167418615245.firebaseapp.com",
+            databaseURL: "https://project-7021442167418615245-default-rtdb.firebaseio.com",
+            projectId: "project-7021442167418615245",
+            storageBucket: "project-7021442167418615245.appspot.com",
+            messagingSenderId: "1061474026436",
+            appId: "1:1061474026436:web:259eb58e32444235e75a91"
+          };
+
+          // Initialize Firebase
+          const app = initializeApp(firebaseConfig);
+
+          import { getDatabase, ref, set, get, child, update, remove, push  } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js";
+
+          const db = getDatabase();
+          const dbref = ref(db);
+
+          // References
+
+          let bookTitle = document.getElementById('book-title');
+          let bookAuthor = document.getElementById('book-author');
+          let bookPublicationYear = document.getElementById('book-publication');
+
+
+          import { getAuth, signInAnonymously, onAuthStateChanged  } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-auth.js";
+
+          const auth = getAuth();
+          var uID = ""; // current uID
+          signInAnonymously(auth)
+            .then(() => {
+              // Signed in..
+            })
+            .catch((error) => {
+              const errorCode = error.code;
+              const errorMessage = error.message;
+              // ...
+            });
+
+          onAuthStateChanged(auth, (user) => {
+            if (user) {
+              // User is signed in, see docs for a list of available properties
+              // https://firebase.google.com/docs/reference/js/firebase.User
+              const uid = user.uid;
+              // ...
+            } else {
+              // User is signed out
+              // ...
+            }
+          });
+
+          onAuthStateChanged(auth, (user) => {
+              if (user) {
+                  getUserData(user.uid);
+              }
+          });
+
+          function getUserData(uid) {
+            const dbref = ref(db);
+            get(child(dbref, 'users/' + uid)).then((snapshot) => {
+              if (snapshot !== null) {
+                uID = snapshot.val();
+                // console.log(snapshot.val());
+                console.log(uID);
+                // alert('Data found');
+              } else {
+                alert('No data found');
+              }
+            })
+            .catch((error)=> {
+              alert('Error: ' + error);
+            });
+          }
+
+          function getData() {
+            const dbref = ref(db);
+            get(child(dbref, '/I7hwFD5hSUfyHOmNLHRzUp')).then((snapshot) => {
+              if(snapshot !== null) {
+                bookmarkDict = snapshot.val().bookmarks;
+                annotationDict = snapshot.val().annotations;
+                bookTitle.textContent = snapshot.val().name;
+                bookAuthor.textContent = snapshot.val().author;
+                bookPublicationYear.textContent = snapshot.val().pubYEAR;
+                pdf = snapshot.val().pdf;
+                // alert('Data Pulled Succesfully');
+              } else {
+                alert('No Data Found');
+              }
+            })
+            .catch((error)=> {
+              alert('Error: ' + error);
+            });
+          }
+
+          function updateBookmarkDict() {
+            update(ref(db, '/I7hwFD5hSUfyHOmNLHRzUp'), {
+              bookmarks : bookmarkDict
+            })
+            .catch((error)=>{
+              alert('Error: ' + error)
+            });
+          }
+
+         function updateAnnotationDict() {
+           update(ref(db, '/I7hwFD5hSUfyHOmNLHRzUp'), {
+             annotations : annotationDict
+           })
+           .catch((error)=>{
+             alert('Error: ' + error)
+           });
+         }
+
+        let currentUser = 'Simon'; // change as a new process if user accounts are added in
+
+        let currentAnnotation = null; // Annotation object selected by the user
+
+        let Book = class {
+            constructor(pdf, name, author, pubYear, bookmarks, annotations) {
+                this.pdf = pdf;
+                this.name = name;
+                this.author = author;
+                this.pubYear = pubYear;
+                this.bookmarks = bookmarks;
+                this.annotations = annotations;
+            }
+        };
+
+        let b = new Book('pdf', 'Harry Potter', 'simon', '2002', '', '');
+
+        let Annotation = class {
+            constructor(name, author, blurb, date, convo, layer, changes) {
+                this.name = name; // Name of an annotation
+                this.author = author; // User who created the annotation, called the "Author"
+                this.blurb = blurb; // Blurb of text related to the annotation
+                this.date = date; // Last edited date
+                this.convo = convo; // Array of string messages (not implemented yet)
+                this.layer = layer; // Serialized Konva.Layer object holding annotation data (Shapes, images, text, highlight etc...)
+                this.changes = changes; // Array of Serialized Konva.Layer object holding annotation data (Data Structure: Undo/Redo Stack-like Array)
+            }
+        };
+
+        // Testing Annotations
+        var l1 = new Konva.Layer();
+        const c1 = l1.getCanvas()._canvas;
+        c1.id = 'annotation-canvas';
+        var tr1 = new Konva.Transformer();
+        l1.add(tr1);
+        var l1Serialized = l1.toJSON();
+        let a1 = new Annotation('My First Annotation', 'Simon', 'Blurb of text related to the annotation', 'Today', [], l1Serialized, [l1Serialized]);
+
+        var l2 = new Konva.Layer();
+        const c2 = l2.getCanvas()._canvas;
+        c2.id = 'annotation-canvas';
+        var tr2 = new Konva.Transformer();
+        l2.add(tr2);
+        var l2Serialized = l2.toJSON();
+        let a2 = new Annotation('My Second Annotation', 'Thuy-Vi', 'Blurb of text related to the annotation', 'Today', [], l2Serialized, [l2Serialized]);
+
+        var l3 = new Konva.Layer();
+        const c3 = l3.getCanvas()._canvas;
+        c3.id = 'annotation-canvas';
+        var tr3 = new Konva.Transformer();
+        l3.add(tr3);
+        var l3Serialized = l3.toJSON();
+        let a3 = new Annotation('My Third Annotation', 'Simon', 'Blurb of text related to the annotation', 'Today', [], l3Serialized, [l3Serialized]);
+
+        var l4 = new Konva.Layer();
+        const c4 = l4.getCanvas()._canvas;
+        c4.id = 'annotation-canvas';
+        var tr4 = new Konva.Transformer();
+        l4.add(tr4);
+        var l4Serialized = l4.toJSON();
+        let a4 = new Annotation('My Fourth Annotation', 'Jad', 'Blurb of text related to the annotation', 'Today', [], l4Serialized, [l4Serialized]);
+
+        var l5 = new Konva.Layer();
+        const c5 = l5.getCanvas()._canvas;
+        c5.id = 'annotation-canvas';
+        var tr5 = new Konva.Transformer();
+        l5.add(tr5);
+        var l5Serialized = l5.toJSON();
+        let a5 = new Annotation('My Fifth Annotation', 'Nathan', 'Blurb of text related to the annotation', 'Today', [], l5Serialized, [l5Serialized]);
+
+        // Data structure containing Annotations
+        var annotationDict = {
+            1: [a1, a2, a3, a4, a5],
+            2: [],
+            3: [],
+            4: [],
+            5: [],
+            6: [],
+            7: [],
+            8: [],
+            9: [],
+            10: [],
+            11: [],
+            12: [],
+            13: [],
+            14: [],
+            15: [],
+            16: [],
+            17: []
+        };
+
+        function generateAnnotationList(pageNum) {
+
+            var annotationListTempContainer = $('<div>', {
+                id: 'annotation-list-temp-container'
+            });
+
+            var annotations = annotationDict[pageNum];
+            for (let i = 0; i < annotations.length; i++) {
+                var aTarget = annotations[i];
+
+                var previewMainContainer = $('<div>', {
+                    id: i + aTarget.name,
+                    class: 'annotation-preview-container'
+                });
+
+                var previewNameContainer = $('<div>', {
+                    class: 'annotation-preview-name-container'
+                });
+                var previewName = $('<span>', {
+                    class: 'annotation-preview-name'
+                });
+                previewName.text(aTarget.name);
+                previewName.appendTo(previewNameContainer);
+                previewNameContainer.appendTo(previewMainContainer);
+
+                var previewAuthorContainer = $('<div>', {
+                    class: 'annotation-preview-author-container'
+                });
+                var previewAuthor = $('<span>', {
+                    class: 'annotation-preview-author'
+                });
+                previewAuthor.text('By: ' + aTarget.author);
+                previewAuthor.appendTo(previewAuthorContainer);
+                previewAuthorContainer.appendTo(previewMainContainer);
+
+                var previewDateContainer = $('<div>', {
+                    class: 'annotation-preview-date-container'
+                });
+                var previewDate = $('<span>', {
+                    class: 'annotation-preview-date'
+                });
+                previewDate.text('Last Edited: ' + aTarget.date);
+                previewDate.appendTo(previewDateContainer);
+                previewDateContainer.appendTo(previewMainContainer);
+
+                previewMainContainer.appendTo(annotationListTempContainer);
+            }
+
+            annotationListTempContainer.appendTo('#annotation-list-container');
+
+            let annotationPreviewContainers = document.getElementsByClassName('annotation-preview-container');
+            Array.from(annotationPreviewContainers).forEach(function (element) {
+                element.addEventListener('mouseover', function () {
+                    document.body.style.cursor = 'pointer';
+                }, false)
+            });
+
+            Array.from(annotationPreviewContainers).forEach(function (element) {
+                element.addEventListener('mouseleave', function () {
+                    document.body.style.cursor = 'default';
+                }, false)
+            });
+
+            Array.from(annotationPreviewContainers).forEach(function (element) {
+                element.addEventListener('click', function () {
+                    if (document.getElementById('annotation-instance-temp-container') !== null) {
+                        document.getElementById('annotation-instance-temp-container').remove();
+                    }
+                    document.getElementById('annotation-list-container').style.display = 'none';
+                    document.getElementById('annotation-instance-container').style.display = 'block';
+                    document.getElementById('annotation-function-toolbar').style.display = 'block';
+
+                    // save current state of layer on stage to the previously selected annotations
+                    if(currentAnnotation !== null && backButtonPressIndicator === false && renderedPageIndicator === false) { // null would mean no annotation has been previously selected
+                      currentAnnotation.layer = layer.toJSON(); // serialize layer as .json and update Annotation object
+                      currentAnnotation.changes = [];
+                      updateAnnotationDict();
+
+                    } else if (currentAnnotation !== null && (backButtonPressIndicator === true || renderedPageIndicator === true)) {
+                      if (backButtonPressIndicator === true) {
+                        backButtonPressIndicator = false;
+                      }
+                      if (renderedPageIndicator === true) {
+                        renderedPageIndicator = false;
+                      }
+                    }
+
+                    redoHistory = []; // Reset available redo history
+
+
+                    // Remove current layer on stage
+                    stage.destroyChildren();
+
+                    // Get currentAnnotation and generate annotation instance view
+                    let index = getIndexFromAnnotation(element.id);
+                    currentAnnotation = annotationDict[pageNum][index];
+                    generateAnnotationInstanceView(currentAnnotation, index);
+
+                    // Get serialized annotation layer
+                    let serializedLayer = currentAnnotation.layer;
+
+                    // Deserialize .json layer to Konva.Layer object
+                    let currentAnnotationLayer = Konva.Node.create(serializedLayer, 'konvajs-content');
+
+                    // Assign a new transformer to the layer (previous is deleted by stage.destroyChildren() call)
+                    let currentAnnotationLayerTransformer = new Konva.Transformer();
+
+                    // Reassign layer tranformer variable
+                    transformer = currentAnnotationLayerTransformer;
+
+                    // Reassign layer variable and add new transformer
+                    layer = currentAnnotationLayer;
+                    layer.add(transformer);
+
+                    // Reload all event listeners on shapes
+                    reloadAllLayerNodeEventListeners();
+                    currentAnnotation.changes = [];
+
+                    // Add layer of currentAnnotation to the static stage
+                    stage.add(layer);
+                    layer.batchDraw();
+                    currentAnnotation.changes.push(layer.toJSON());
+                    redoHistory.push(layer.toJSON());
+                }, false)
+            });
+
+            $(".annotation-preview-container").mouseover(
+              function() {
+                $(this).css("color", "#f77062");
+              }
+            );
+            $(".annotation-preview-container").mouseleave(
+              function() {
+                $(this).css("color", "white");
+              }
+            );
+        }
+        document.getElementById('annotation-function-toolbar').style.display = 'none';
+
+        function getIndexFromAnnotation(id) {
+          let arrayIndex = '';
+          for (let i = 0; i < id.length; i++) {
+              if (!isNaN(id[i])) {
+                  arrayIndex = arrayIndex + id[i];
+              }
+          }
+          return parseInt(arrayIndex);
+        }
+
+        let currentlySelectedAnnotationInstanceIndex = 0;
+        function generateAnnotationInstanceView(selectedAnnotation, index) {
+          currentlySelectedAnnotationInstanceIndex = index;
+
+          var annotationInstanceTempContainer = $('<div>', {
+              id: "annotation-instance-temp-container"
+          });
+
+          var annotationInstanceNameContainer = $('<div>', {
+              id: 'annotation-instance-name-container'
+          });
+          var annotationInstanceName = $('<span>', {
+              id: 'annotation-instance-name'
+          });
+          annotationInstanceName.text(selectedAnnotation.name);
+          annotationInstanceName.appendTo(annotationInstanceNameContainer);
+          annotationInstanceNameContainer.appendTo(annotationInstanceTempContainer);
+
+          var editNameContainer = $('<div>', {
+              id: 'annotation-instance-name-input-container'
+          });
+          var editNameLabel = $('<span>', {
+            id: 'annotation-instance-name-label'
+          });
+          var editNameInput = $('<input>', {
+              id: 'annotation-instance-name-input',
+              type: 'text',
+              maxlength: '50'
+          });
+          editNameLabel.text('Name: ');
+          editNameLabel.appendTo(editNameContainer);
+          editNameInput.text(selectedAnnotation.name);
+          editNameInput.appendTo(editNameContainer);
+          editNameContainer.appendTo(annotationInstanceTempContainer);
+
+
+          var annotationInstanceAuthorContainer = $('<div>', {
+              id: 'annotation-instance-author-container'
+          });
+          var annotationInstanceAuthor = $('<span>', {
+              id: 'annotation-instance-author'
+          });
+          annotationInstanceAuthor.text('By: ' + selectedAnnotation.author);
+          annotationInstanceAuthor.appendTo(annotationInstanceAuthorContainer);
+          annotationInstanceAuthorContainer.appendTo(annotationInstanceTempContainer);
+
+          var descDisplayButtonContainer = $('<div>', {
+              id: 'annotation-instance-desc-display-button-container'
+          });
+          var descDisplayButton = $('<button>', {
+              id: 'annotation-instance-desc-display-button'
+          });
+          descDisplayButton.text('View Description');
+          descDisplayButton.appendTo(descDisplayButtonContainer);
+          descDisplayButtonContainer.appendTo(annotationInstanceTempContainer);
+
+          var annotationInstanceDescContainer = $('<div>', {
+              id: 'annotation-instance-desc-container'
+          });
+          var annotationInstanceDesc = $('<p>', {
+              id: 'annotation-instance-desc'
+          });
+          annotationInstanceDesc.text(selectedAnnotation.blurb);
+          annotationInstanceDesc.appendTo(annotationInstanceDescContainer);
+          annotationInstanceDescContainer.appendTo(annotationInstanceTempContainer);
+
+          var editDescContainer = $('<div>', {
+              id: 'annotation-instance-desc-input-container'
+          });
+          var editDescLabel = $('<span>', {
+            id: 'annotation-instance-desc-label'
+          });
+          var editDescInput = $('<input>', {
+              id: 'annotation-instance-desc-input',
+              type: 'text',
+              maxlength: '500'
+          });
+          editDescLabel.text('Description: ');
+          editDescLabel.appendTo(editDescContainer);
+          editDescInput.text(selectedAnnotation.blurb);
+          editDescInput.appendTo(editDescContainer);
+          editDescContainer.appendTo(annotationInstanceTempContainer);
+
+          annotationInstanceDesc.text(selectedAnnotation.blurb);
+          annotationInstanceDesc.appendTo(annotationInstanceDescContainer);
+          annotationInstanceDescContainer.appendTo(annotationInstanceTempContainer);
+
+
+          annotationInstanceTempContainer.appendTo('#annotation-instance-container');
+
+          document.getElementById('annotation-instance-desc-container').style.display = 'none';
+          document.getElementById('annotation-instance-desc-display-button').addEventListener('click', toggleAnnotationInstanceDescView);
+
+          document.getElementById('annotation-instance-name-input-container').style.display = 'none';
+          document.getElementById('annotation-instance-desc-input-container').style.display = 'none';
+
+          $('#annotation-instance-desc-display-button').mouseover(
+            function() {
+              $(this).css("color", "#f77062");
+            }
+          );
+
+          $('#annotation-instance-desc-display-button').mouseleave(
+            function() {
+              $(this).css("color", "white");
+            }
+          );
+        }
+
+        function generateNewAnnotationInstance() {
+
+          var annotationInstanceTempContainer = $('<div>', {
+              id: "annotation-instance-temp-container"
+          });
+
+          var editNameContainer = $('<div>', {
+              id: 'annotation-instance-name-input-container'
+          });
+          var editNameLabel = $('<span>', {
+            id: 'annotation-instance-name-label'
+          });
+          var editNameInput = $('<input>', {
+              id: 'annotation-instance-name-input',
+              type: 'text',
+              maxlength: '50'
+          });
+          editNameLabel.text('Name: ');
+          editNameLabel.appendTo(editNameContainer);
+          editNameInput.appendTo(editNameContainer);
+          editNameContainer.appendTo(annotationInstanceTempContainer);
+
+
+          var annotationInstanceAuthorContainer = $('<div>', {
+              id: 'annotation-instance-author-container'
+          });
+          var annotationInstanceAuthor = $('<span>', {
+              id: 'annotation-instance-author'
+          });
+          annotationInstanceAuthor.text('By: ' + currentUser);
+          annotationInstanceAuthor.appendTo(annotationInstanceAuthorContainer);
+          annotationInstanceAuthorContainer.appendTo(annotationInstanceTempContainer);
+
+          var editDescContainer = $('<div>', {
+              id: 'annotation-instance-desc-input-container'
+          });
+          var editDescLabel = $('<span>', {
+            id: 'annotation-instance-desc-label'
+          });
+          var editDescInput = $('<input>', {
+              id: 'annotation-instance-desc-input',
+              type: 'text',
+              maxlength: '500'
+          });
+          editDescLabel.text('Description: ');
+          editDescLabel.appendTo(editDescContainer);
+          editDescInput.appendTo(editDescContainer);
+          editDescContainer.appendTo(annotationInstanceTempContainer);
+
+          annotationInstanceTempContainer.appendTo('#annotation-instance-container');
+
+          document.getElementById('annotation-instance-back-button').textContent = 'Cancel';
+          document.getElementById('annotation-instance-view-edit-toggle-button').textContent = 'Save Annotation';
+          document.getElementById('annotation-instance-name-input-container').style.display = 'inline-block';
+          document.getElementById('annotation-instance-desc-input-container').style.display = 'inline-block';
+          document.getElementById('annotation-instance-name-input').value = '';
+          document.getElementById('annotation-instance-desc-input').value = '';
+        }
+
+        let backButtonPressIndicator = false;
+        function toggleInstanceAnnotationViewToListView() {
+          if(document.getElementById('annotation-instance-back-button').textContent === 'Back') {
+            document.getElementById('annotation-list-temp-container').remove();
+            generateAnnotationList(pageNum);
+            document.getElementById('annotation-list-container').style.display = 'block';
+            document.getElementById('annotation-instance-container').style.display = 'none';
+            document.getElementById('annotation-function-toolbar').style.display = 'none';
+            document.getElementById('object-attribute-editing-toolbar-container').style.display = 'none';
+
+            // remove annotation until next selection
+            currentAnnotation.layer = layer.toJSON();
+            currentAnnotation.changes = [];
+
+            // UPDATE DATABASE GOES HERE
+            updateAnnotationDict();
+
+            stage.destroyChildren();
+            backButtonPressIndicator = true;
+
+            if(document.getElementById('filter-to-all-my-annotations-button').textContent === '↻ All Annotations') {
+              for (let i = 0; i < annotationDict[pageNum].length; i++) {
+                if (annotationDict[pageNum][i].author !== currentUser) {
+                  document.getElementById(i + annotationDict[pageNum][i].name).style.display = 'none';
+                }
+              }
+            } else {
+              var unfilteredAnnotations = document.getElementsByClassName('annotation-preview-container');
+              Array.from(unfilteredAnnotations).forEach(function (e) {
+                e.style.display = 'block';
+              });
+            }
+          } else { // button textContent = 'cancel'
+            if (document.getElementById('annotation-instance-view-edit-toggle-button').textContent === 'Save Annotation') {
+              if (document.getElementById('annotation-instance-temp-container') !== null) {
+                  document.getElementById('annotation-instance-temp-container').remove(); // remove currently existing container
+              }
+              document.getElementById('annotation-instance-back-button').textContent = 'Back';
+              document.getElementById('annotation-instance-view-edit-toggle-button').textContent = 'Edit Annotation';
+              document.getElementById('annotation-list-container').style.display = 'block';
+              document.getElementById('annotation-instance-container').style.display = 'none';
+              document.getElementById('annotation-instance-delete-button').style.display = 'inline-block';
+              return;
+            }
+            document.getElementById('annotation-instance-back-button').textContent = 'Back';
+            document.getElementById('annotation-instance-view-edit-toggle-button').textContent = 'Edit Annotation';
+            document.getElementById('annotation-instance-name-input-container').style.display = 'none';
+            document.getElementById('annotation-instance-desc-input-container').style.display = 'none';
+            document.getElementById('annotation-instance-name-container').style.display = 'block';
+            document.getElementById('annotation-instance-desc-display-button-container').style.display = 'block';
+          }
+        }
+        document.getElementById('annotation-instance-back-button').addEventListener('click', toggleInstanceAnnotationViewToListView);
+
+        function toggleAnnotationListItems() {
+            if(document.getElementById('filter-to-all-my-annotations-button').textContent === '↻ All Annotations') {
+              // filter annotations in the annotations list to all existing annotations
+              // process
+              var unfilteredAnnotations = document.getElementsByClassName('annotation-preview-container');
+              Array.from(unfilteredAnnotations).forEach(function (e) {
+                e.style.display = 'block';
+              });
+              document.getElementById('filter-to-all-my-annotations-button').textContent = '↻ My Annotations';
+              document.getElementById('annotation-list-header').textContent = 'All Annotations';
+            } else {
+              for (let i = 0; i < annotationDict[pageNum].length; i++) {
+                if (annotationDict[pageNum][i].author !== currentUser) {
+                  document.getElementById(i + annotationDict[pageNum][i].name).style.display = 'none';
+                }
+              }
+              // filter annotations in the annotations list to only those associated with the user in session
+              // process
+              document.getElementById('annotation-list-header').textContent = 'My Annotations';
+              document.getElementById('filter-to-all-my-annotations-button').textContent = '↻ All Annotations';
+            }
+        }
+        document.getElementById('filter-to-all-my-annotations-button').addEventListener('click', toggleAnnotationListItems);
+
+        function toggleAnnotationListView() {
+            if (document.getElementById('open-annotations-sidebar-button').textContent === "☰") {
+                document.getElementById('open-annotations-sidebar-button').textContent = "☰ Active Annotations List";
+                document.getElementById('open-annotations-sidebar-button').style.width = '290px';
+                if (document.getElementById('annotation-function-toolbar').style.display !== 'none') {
+                  document.getElementById('annotation-instance-container').style.display = 'block';
+                } else {
+                  document.getElementById('annotation-list-container').style.display = "block";
+                }
+            } else {
+                document.getElementById('open-annotations-sidebar-button').textContent = "☰";
+                document.getElementById('open-annotations-sidebar-button').style.width = 'auto';
+                document.getElementById('annotation-instance-container').style.display = 'none';
+                document.getElementById('annotation-list-container').style.display = 'none';
+            }
+        }
+        document.getElementById('open-annotations-sidebar-button').style.width = 'auto';
+        document.getElementById('annotation-list-container').style.display = "none";
+        document.getElementById('annotation-instance-container').style.display = 'none';
+        document.getElementById('open-annotations-sidebar-button').addEventListener('click', toggleAnnotationListView);
+
+        function toggleAnnotationInstanceDescView() {
+          if(document.getElementById('annotation-instance-desc-display-button').textContent === 'View Description') {
+            document.getElementById('annotation-instance-desc-display-button').textContent = 'Hide Description';
+            document.getElementById('annotation-instance-desc-container').style.display = 'block';
+          } else {
+            document.getElementById('annotation-instance-desc-display-button').textContent = 'View Description';
+            document.getElementById('annotation-instance-desc-container').style.display = 'none';
+          }
+        }
+
+        function deleteAnnotation() {
+          // Remove annotation from dictionary
+          annotationDict[pageNum].splice(currentlySelectedAnnotationInstanceIndex, 1);
+          document.getElementById('annotation-list-temp-container').remove();
+          generateAnnotationList(pageNum);
+          document.getElementById('annotation-list-temp-container').
+          document.getElementById('object-attribute-editing-toolbar-container').style.display = 'none';
+
+          // UPDATE DATABASE GOES HERE
+          updateAnnotationDict();
+
+          stage.destroyChildren();
+
+          document.getElementById('annotation-list-container').style.display = 'block';
+          document.getElementById('annotation-instance-container').style.display = 'none';
+          document.getElementById('annotation-function-toolbar').style.display = 'none';
+          document.getElementById('annotation-instance-back-button').textContent = 'Back';
+          document.getElementById('annotation-instance-view-edit-toggle-button').textContent = 'Edit Annotation';
+          if(document.getElementById('filter-to-all-my-annotations-button').textContent === '↻ All Annotations') {
+            for (let i = 0; i < annotationDict[pageNum].length; i++) {
+              if (annotationDict[pageNum][i].author !== currentUser) {
+                document.getElementById(i + annotationDict[pageNum][i].name).style.display = 'none';
+              }
+            }
+          } else {
+            var unfilteredAnnotations = document.getElementsByClassName('annotation-preview-container');
+            Array.from(unfilteredAnnotations).forEach(function (e) {
+              e.style.display = 'block';
+            });
+          }
+        }
+        document.getElementById('annotation-instance-delete-button').addEventListener('click', deleteAnnotation);
+
+        function editAnnotation() {
+          if (document.getElementById('annotation-instance-view-edit-toggle-button').textContent === 'Save Annotation') {
+            saveNewAnnotation();
+            return;
+          }
+          let annSelected = annotationDict[pageNum][currentlySelectedAnnotationInstanceIndex];
+          if (document.getElementById('annotation-instance-view-edit-toggle-button').textContent === 'Save Changes') {
+            if (document.getElementById('annotation-instance-name-input').value === "" || document.getElementById('annotation-instance-desc-input').value === "") {
+              console.log('FIELD IS EMPTY!!!');
+              return;
+            } else {
+              annSelected.name = document.getElementById('annotation-instance-name-input').value;
+              annSelected.desc = document.getElementById('annotation-instance-desc-input').value;
+
+              // UPDATE DATABASE GOES HERE
+              updateAnnotationDict();
+
+              document.getElementById('annotation-instance-name').textContent = document.getElementById('annotation-instance-name-input').value;
+              document.getElementById('annotation-instance-desc').textContent = document.getElementById('annotation-instance-desc-input').value;
+              document.getElementById('annotation-instance-name-input-container').style.display = 'none';
+              document.getElementById('annotation-instance-desc-input-container').style.display = 'none';
+              document.getElementById('annotation-instance-name-container').style.display = 'block';
+              document.getElementById('annotation-instance-desc-display-button-container').style.display = 'block';
+              document.getElementById('annotation-instance-back-button').textContent = 'Back';
+              document.getElementById('annotation-instance-view-edit-toggle-button').textContent = 'Edit Annotation';
+            }
+          } else {
+            document.getElementById('annotation-instance-back-button').textContent = 'Cancel';
+            document.getElementById('annotation-instance-view-edit-toggle-button').textContent = 'Save Changes';
+
+            document.getElementById('annotation-instance-name-input-container').style.display = 'inline-block';
+            document.getElementById('annotation-instance-desc-input-container').style.display = 'inline-block';
+            document.getElementById('annotation-instance-name-input').value = annSelected.name;
+            document.getElementById('annotation-instance-desc-input').value = annSelected.blurb;
+
+            document.getElementById('annotation-instance-name-container').style.display = 'none';
+            document.getElementById('annotation-instance-desc-display-button-container').style.display = 'none';
+          }
+        }
+        document.getElementById('annotation-instance-view-edit-toggle-button').addEventListener('click', editAnnotation);
+
+        function addAnnotation() {
+          if (document.getElementById('annotation-instance-temp-container') !== null) {
+              document.getElementById('annotation-instance-temp-container').remove(); // remove currently existing container
+          }
+
+          if(currentAnnotation !== null && backButtonPressIndicator !== true && renderedPageIndicator !== true) {
+            currentAnnotation.layer = layer.toJSON();
+            currentAnnotation.changes = [];
+            // UPDATE DATABASE GOES HERE
+            updateAnnotationDict();
+          }
+          stage.destroyChildren();
+          generateNewAnnotationInstance(); // generate new container with annotation creation form
+          document.getElementById('annotation-list-container').style.display = 'none';
+          document.getElementById('annotation-instance-container').style.display = 'block';
+          document.getElementById('annotation-instance-delete-button').style.display = 'none';
+        }
+        document.getElementById('add-new-annotation-button').addEventListener('click', addAnnotation);
+
+        function saveNewAnnotation() {
+          var lNew = new Konva.Layer();
+          const cNew = lNew.getCanvas()._canvas;
+          cNew.id = 'annotation-canvas';
+          var trNew = new Konva.Transformer();
+          lNew.add(trNew);
+          var l1Serialized = lNew.toJSON();
+          let aNew = new Annotation(
+            document.getElementById('annotation-instance-name-input').value,
+            currentUser,
+            document.getElementById('annotation-instance-desc-input').value,
+            'Today',
+            [],
+            l1Serialized,
+            []
+          );
+          annotationDict[pageNum].push(aNew);
+
+          // UPDATE DATABASE GOES HERE
+          updateAnnotationDict();
+
+          document.getElementById('annotation-list-temp-container').remove();
+          generateAnnotationList(pageNum);
+          document.getElementById('annotation-instance-back-button').textContent = 'Back';
+          document.getElementById('annotation-instance-view-edit-toggle-button').textContent = 'Edit Annotation';
+          if (document.getElementById('annotation-instance-temp-container') !== null) {
+              document.getElementById('annotation-instance-temp-container').remove();
+          }
+          document.getElementById('annotation-instance-back-button').textContent = 'Back';
+          document.getElementById('annotation-list-container').style.display = 'block';
+          document.getElementById('annotation-instance-container').style.display = 'none';
+          document.getElementById('annotation-instance-delete-button').style.display = 'inline-block';
+          if(document.getElementById('filter-to-all-my-annotations-button').textContent === '↻ All Annotations') {
+            for (let i = 0; i < annotationDict[pageNum].length; i++) {
+              if (annotationDict[pageNum][i].author !== currentUser) {
+                document.getElementById(i + annotationDict[pageNum][i].name).style.display = 'none';
+              }
+            }
+          } else {
+            var unfilteredAnnotations = document.getElementsByClassName('annotation-preview-container');
+            Array.from(unfilteredAnnotations).forEach(function (e) {
+              e.style.display = 'block';
+            });
+          }
+        }
+
+        var $ = jQuery;
+
+        var pdf = 'test.pdf';
+
+        var bookmarkedIcon = "bookmark_icon.png";
+        var nonBookmarkedIcon = "non_bookmark_icon.png";
+
+        var bookmarkDict = {
+            1: "",
+            2: "",
+            3: "My Second Bookmark",
+            4: "",
+            5: "",
+            6: "",
+            7: "",
+            8: "",
+            9: "",
+            10: "My First Bookmark",
+            11: "",
+            12: "",
+            13: "",
+            14: "",
+            15: "",
+            16: "",
+            17: ""
+        };
+
+        var pdfDoc = null,
+            pageNum = 1,
+            pageRendering = false,
+            pageNumPending = null,
+            scale = 0.8,
+            canvas = document.getElementById('the-canvas'),
+            ctx = canvas.getContext('2d');
+
+        let renderedPageIndicator = false;
+
+        /**
+         * Get page info from document, resize canvas accordingly, and render page.
+         * @param num Page number.
+         */
+        function renderPage(num) {
+            pageRendering = true;
+            // Using promise to fetch the page
+            pdfDoc.getPage(num).then(function (page) {
+                var viewport = page.getViewport({
+                    scale: scale
+                });
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                // Render PDF page into canvas context
+                var renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                var renderTask = page.render(renderContext);
+
+                // Wait for rendering to finish
+                renderTask.promise.then(function () {
+                    pageRendering = false;
+                    if (pageNumPending !== null) {
+                        // New page rendering is pending
+                        renderPage(pageNumPending);
+                        pageNumPending = null;
+                    }
+                });
+            });
+
+            // Update page counters
+            document.getElementById('page-num').value = num;
+
+            // Ensure annotation related DOM objects are updated on page change
+            if (document.getElementById('annotation-list-temp-container') !== null) {
+              document.getElementById('annotation-list-temp-container').remove();
+              if (document.getElementById('annotation-function-toolbar').style.display !== 'none') {
+                if (document.getElementById('open-annotations-sidebar-button').textContent !== "☰") {
+                    document.getElementById('annotation-list-container').style.display = "block";
+                    document.getElementById('open-annotations-sidebar-button').textContent = "☰ Active Annotations List";
+                    document.getElementById('open-annotations-sidebar-button').style.width = '290px';
+                }
+              }
+              document.getElementById('object-attribute-editing-toolbar-container').style.display = 'none';
+              document.getElementById('annotation-instance-container').style.display = 'none';
+              document.getElementById('annotation-function-toolbar').style.display = 'none';
+              document.getElementById('annotation-instance-back-button').textContent = 'Back';
+              document.getElementById('annotation-instance-view-edit-toggle-button').textContent = 'Edit Annotation';
+              document.getElementById('annotation-instance-delete-button').style.display = 'inline-block';
+            }
+            generateAnnotationList(num); // regenerates list while hidden
+
+            if(currentAnnotation !== null && renderedPageIndicator !== true && backButtonPressIndicator !== true) {
+              currentAnnotation.layer = layer.toJSON();
+              stage.destroyChildren();
+              renderedPageIndicator = true;
+            }
+
+            // UPDATE DATABASE GOES HERE
+            updateAnnotationDict();
+        }
+
+        /**
+         * Get page info from document, resize canvas accordingly, and render page.
+         * @param num Page number.
+         */
+        function renderInputtedPage(num) {
+            pageRendering = true;
+            // Using promise to fetch the page
+            pdfDoc.getPage(num).then(function (page) {
+                var viewport = page.getViewport({
+                    scale: scale
+                });
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                // Render PDF page into canvas context
+                var renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                var renderTask = page.render(renderContext);
+
+                // Wait for rendering to finish
+                renderTask.promise.then(function () {
+                    pageRendering = false;
+                    if (pageNumPending !== null) {
+                        // New page rendering is pending
+                        renderPage(pageNumPending);
+                        pageNumPending = null;
+                    }
+                });
+            });
+
+            // Update page counters
+            document.getElementById('page-num').value = num;
+        }
+
+        /**
+         * If another page rendering in progress, waits until the rendering is
+         * finised. Otherwise, executes rendering immediately.
+         */
+        function queueRenderPage(num, functType) { // Review implementation, no need for functType anymore
+            if (pageRendering) {
+                pageNumPending = num;
+            } else {
+                if (functType == 1) {
+                    renderPage(num);
+                } else {
+                    renderPage(num);
+                }
+            }
+        }
+
+        /**
+         * Displays previous page.
+         */
+        function onPrevPage() {
+            if (pageNum <= 1) {
+                return;
+            }
+            pageNum--; // update counter first
+
+            // then check if bookmark
+            if (bookmarkDict[pageNum] !== "") {
+                document.getElementById('bookmark-icon').src = bookmarkedIcon;
+                document.getElementById('input-bookmark-name').value = bookmarkDict[pageNum]; // value needs to be equal to: var currentBookmarkName
+
+                document.getElementById('remove-cancel-bookmark').textContent = "Remove"; // changes the button text to Remove instead of Cancel
+            } else {
+                document.getElementById('bookmark-icon').src = nonBookmarkedIcon;
+                document.getElementById('input-bookmark-name').value = ""; // value needs to be empty
+
+                document.getElementById('remove-cancel-bookmark').textContent= "Cancel"; // changes the button text to Remove instead of Cancel
+            }
+            queueRenderPage(pageNum, 1);
+        }
+        document.getElementById('previous-page').addEventListener('click', onPrevPage);
+
+        /**
+         * Displays next page.
+         */
+        function onNextPage() {
+            if (pageNum >= pdfDoc.numPages) {
+                return;
+            }
+
+            pageNum++; // update counter first
+
+            // then check if bookmark
+            if (bookmarkDict[pageNum] !== "") {
+                document.getElementById('bookmark-icon').src = bookmarkedIcon;
+                document.getElementById('input-bookmark-name').value = bookmarkDict[pageNum]; // value needs to be equal to: var currentBookmarkName
+                document.getElementById('remove-cancel-bookmark').textContent = "Remove"; // changes the button text to Remove instead of Cancel
+            } else {
+                document.getElementById('bookmark-icon').src = nonBookmarkedIcon;
+                document.getElementById('input-bookmark-name').value = ""; // value needs to be empty
+                document.getElementById('remove-cancel-bookmark').textContent = "Cancel"; // changes the button text to Remove instead of Cancel
+            }
+            queueRenderPage(pageNum, 1);
+        }
+        document.getElementById('next-page').addEventListener('click', onNextPage);
+
+        /**
+         * Displays inputted page.
+         */
+        function onInputtedPage() {
+            if (pageNum > pdfDoc.numPages || pageNum < 1) {
+                return;
+            }
+            // update counter first
+            pageNum--;
+            pageNum++;
+
+            // then check if bookmark
+            if (bookmarkDict[pageNum] !== "") {
+                document.getElementById('bookmark-icon').src = bookmarkedIcon;
+                document.getElementById('input-bookmark-name').value = bookmarkDict[pageNum]; // value needs to be equal to: var currentBookmarkName
+                document.getElementById('remove-cancel-bookmark').textContent = "Remove"; // changes the button text to Remove instead of Cancel
+            } else {
+                document.getElementById('bookmark-icon').src = nonBookmarkedIcon;
+                document.getElementById('input-bookmark-name').value = ""; // value needs to be empty
+                document.getElementById('remove-cancel-bookmark').textContent = "Cancel"; // changes the button text to Remove instead of Cancel
+            }
+
+            queueRenderPage(pageNum, 1);
+        }
+        document.getElementById('go-to-page').addEventListener('click', onInputtedPage);
+
+        /**
+         * Asynchronously downloads PDF. ***This acts as the current OnLoad function.***
+         */
+
+        getData();
+
+        pdfjsLib.getDocument(pdf).promise.then(function (pdfDoc_) {
+            pdfDoc = pdfDoc_;
+            document.getElementById('page-count').textContent = pdfDoc.numPages;
+            document.getElementById('page-num').setAttribute("max", pdfDoc.numPages);
+
+            // Initial/first page rendering
+            renderPage(pageNum);
+            createListOfExistingBookmarks(); // creates list of existing bookmarks
+            shapeAttributeEditingToolbar(); // creates toolbar for object attribute editing
+        });
+
+        document.getElementById('page-num').addEventListener('change', (event) => {
+            if (document.getElementById('page-num').value > pdfDoc.numPages) {
+                pageNum = pdfDoc.numPages;
+                document.getElementById('page-num').value = pdfDoc.numPages;
+            } else if (document.getElementById('page-num').value < 1) {
+                pageNum = 1;
+                document.getElementById('page-num').value = 1;
+            } else {
+                pageNum = document.getElementById('page-num').value;
+            }
+        });
+
+        /** ZOOM-IN/OUT FUNCTIONALITY */
+
+        /**
+         * Zoom's in page document
+         */
+        function zoomIn() {
+            if(scale <= 1.3) {
+
+              // PDF canvas scaling
+              scale = scale + 0.1;
+              renderInputtedPage(pageNum); // change behavior with second function
+
+              // DOM elements scaling
+              var w = document.getElementById('the-canvas').offsetWidth + 61;
+              document.getElementById('pdf-displaying-canvas-container').setAttribute("style","width:" + w + "px");
+              document.getElementById('canvas-area').style.width = w + 'px';
+              document.getElementById('annotating-canvas').style.width = w + 'px';
+
+              var kh = document.getElementById('the-canvas').offsetHeight + 80;
+              document.getElementById('canvas-area').style.height = kh + 'px'; // Div container for all canvas elements
+              document.getElementById('annotating-canvas').style.height = kh + 'px'; // Div container for Konva Stage
+
+              // Konva Stage (and child nodes) scaling
+              stage.width(w);
+              stage.height(kh);
+              var currentScaleX = stage.getAbsoluteScale().x;
+              stage.scaleX(currentScaleX + 0.125);
+              var currentScaleY = stage.getAbsoluteScale().y;
+              stage.scaleY(currentScaleY + 0.125);
+
+              // Object selection handling
+              transformer.nodes([]);
+              if (document.getElementById('existing-text-area') !== null) { // handling of textboxes
+                  document.getElementById('existing-text-area').remove();
+                  selectedObject.show();
+              }
+              layer.draw();
+            }
+        }
+        document.getElementById('zoom-in').addEventListener('click', zoomIn);
+
+        /**
+         * Zoom's out page document
+         */
+        function zoomOut() {
+            if (scale >= 0.7) {
+              // PDF canvas scaling
+              scale = scale - 0.1;
+              renderInputtedPage(pageNum);
+
+              // DOM elements scaling
+              var w = document.getElementById('the-canvas').offsetWidth - 61;
+              document.getElementById('pdf-displaying-canvas-container').setAttribute("style","width:" + w + "px");
+              document.getElementById('canvas-area').style.width = w + 'px';
+              document.getElementById('annotating-canvas').style.width = w + 'px';
+
+              var kh = document.getElementById('the-canvas').offsetHeight - 80;
+              document.getElementById('canvas-area').style.height = kh + 'px';
+              document.getElementById('annotating-canvas').style.height = kh + 'px';
+
+              // Konva Stage (and child nodes) scaling
+              stage.width(w);
+              stage.height(kh);
+              var currentScaleX = stage.getAbsoluteScale().x;
+              stage.scaleX(currentScaleX - 0.125);
+              var currentScaleY = stage.getAbsoluteScale().y;
+              stage.scaleY(currentScaleY - 0.125);
+
+              // Object selection handling
+              transformer.nodes([]);
+              if (document.getElementById('existing-text-area') !== null) {
+                  document.getElementById('existing-text-area').remove();
+                  selectedObject.show();
+              }
+              layer.draw();
+          }
+        }
+        document.getElementById('zoom-out').addEventListener('click', zoomOut);
+
+
+        /** BOOKMARK DROPDOWN LIST FUNCTIONALITY */
+
+        var bookmarkListHideIcon = "bookmark_list_down_arrow.png";
+        var bookmarkListDisplayIcon = "bookmark_list_up_arrow.png";
+
+        /**
+         * Displays the list of existing bookmarks
+         */
+        function displayBookmarkList() {
+            document.getElementById('bookmark-list-icon').src = bookmarkListDisplayIcon;
+            document.getElementById('bookmark-popup-list-container').style.display = "block";
+        }
+
+
+        /**
+         * Hide the list of existing bookmarks
+         */
+        function hideBookmarkList() {
+            document.getElementById('bookmark-list-icon').src = bookmarkListHideIcon;
+            document.getElementById('bookmark-popup-list-container').style.display = "none";
+        }
+
+
+        /**
+         * Toggles the display of the drop-down bookmark list through the bookmark icon(s)
+         */
+        function hideDisplayListToggle() {
+            var dVal = document.getElementById('bookmark-popup-list-container');
+            if (window.getComputedStyle(dVal).display.valueOf() === "none") {
+                displayBookmarkList();
+                hideBookmarkForm();
+            } else {
+                hideBookmarkList();
+            }
+        }
+        document.getElementById('nav-bookmarked-pages').addEventListener('click', hideDisplayListToggle);
+
+
+        /**
+         * Create the html drop - down list with jQuery on page load and embed the element in a container that's hidden. Reveal when displayed on click of nav-bookmarked-pages button.
+         */
+        function createListOfExistingBookmarks() {
+            for (let i = 1; i <= Object.keys(bookmarkDict).length; i++) {
+                if (bookmarkDict[i] !== "") {
+                    var link = $('<button>', {
+                        id: i,
+                        class: 'bookmark-list-items-button',
+                        type: 'button'
+                    });
+                    var listItem = $('<li>', {
+                        id: 'bookmark-page' + i,
+                        class: 'existing-bookmark-unordered-list-item'
+                    });
+                    link.appendTo(listItem);
+                    listItem.appendTo('#existing-bookmark-unordered-list');
+
+                    // add textContent and EventListener to new button
+                    document.getElementById(i).textContent = bookmarkDict[i] + " | " + " Page " + i;
+                }
+            }
+            let bmButtons = document.getElementsByClassName('bookmark-list-items-button');
+            Array.from(bmButtons).forEach(function (element) {
+                element.addEventListener('click', function () {
+                    navigateToBookmarkPage(parseInt(element.id));
+                }, false)
+            });
+        }
+
+        /**
+         * Displays the selected bookmarked page
+         * @param num: bookmarked page number to selected for navigation
+        */
+        function navigateToBookmarkPage(num) {
+            if (num != pageNum) {
+                renderPage(num);
+                pageNum = num;
+                // Initialize bookmark indicators
+                document.getElementById('bookmark-icon').src = bookmarkedIcon;
+                document.getElementById('input-bookmark-name').value = bookmarkDict[pageNum]; // value needs to be equal to: var currentBookmarkName
+                document.getElementById('remove-cancel-bookmark').textContent = "Remove"; // changes the button text to Remove instead of Cancel
+            }
+            hideBookmarkList();
+        }
+        let bookmarkButtons = document.getElementsByClassName('bookmark-list-items-button');
+        Array.from(bookmarkButtons).forEach(function (element) {
+            element.addEventListener('click', function() {
+                navigateToBookmarkPage(parseInt(element.id));
+            }, false)
+        });
+
+        // BOOKMARKING FUNCTIONALITY
+
+        /**
+         * Displays the form to create a bookmark
+         */
+        function displayBookmarkForm() {
+            document.getElementById("bookmark-popup-form-container").style.display = "block";
+        }
+
+        /**
+         * Hide the form to create a bookmark
+         */
+        function hideBookmarkForm() {
+            document.getElementById("bookmark-popup-form-container").style.display = "none";
+        }
+
+        /**
+         * Toggles the display of the pop-up bookmark form through the bookmark icon(s)
+         * @param display
+         */
+        function hideDisplayFormToggle() {
+            var dVal = document.getElementById('bookmark-popup-form-container');
+            var type = document.getElementById('remove-cancel-bookmark').textContent;
+            if (window.getComputedStyle(dVal).display.valueOf() === "none") {
+                displayBookmarkForm();
+                hideBookmarkList();
+            } else {
+                if(type === "Remove") { // this means that the existing bookmark may have been edited but should now be reset since the changes weren't submitted.
+                    document.getElementById("input-bookmark-name").value = bookmarkDict[pageNum];
+                    hideBookmarkForm();
+                } else {
+                    document.getElementById("input-bookmark-name").value = ""; // the name of the bookmark is reset
+                    hideBookmarkForm();
+                }
+            }
+        }
+        document.getElementById('bookmark-button').addEventListener('click', hideDisplayFormToggle);
+
+        /**
+         * Check if there is already a bookmark with the same name
+         * @param name: the inputted bookmark name requested by the user
+         */
+        function validateBookmarkName(name) {
+            for (let i = 1; i <= Object.keys(bookmarkDict).length; i++) {
+                if (bookmarkDict[i] === name) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /**
+         * Creates a new bookmark or edits an existing bookmark
+         */
+        function addEditBookmark() {
+            var type = document.getElementById('remove-cancel-bookmark').textContent;
+            var newBookmarkName = document.getElementById("input-bookmark-name").value;
+            let formattedName = newBookmarkName.trim();
+            if (formattedName === "") {
+                // ADD THIS FEATURE: display popup warning and keep pop-up form visible
+                alert("You need to enter a bookmark name!");
+                return false;
+            }
+            if (type === "Remove") { // editing of an existing bookmark
+                if (formattedName === bookmarkDict[pageNum]) { // this one works!
+                    hideBookmarkForm();
+                } else if (validateBookmarkName(formattedName) === false) {
+                    alert("Bookmark with the same name already exists! Please enter another bookmark name");
+                    return false;
+                } else {
+                    // update dictionary
+                    bookmarkDict[pageNum] = formattedName;
+                    // update button text after editing
+                    document.getElementById(pageNum).textContent = formattedName + " | " + " Page " + pageNum;
+                    hideBookmarkForm(); // edit successful, simply close the form.
+                    // !!!UPDATE DATABASE GOES HERE!!!
+                    updateBookmarkDict();
+                    return false;
+                }
+            } else { // creation of a new bookmark
+                if (validateBookmarkName(formattedName) === false) {
+                    alert("Bookmark with the same name already exists! Please enter another bookmark name");
+                    return false;
+                } else {
+                    // update dictionary
+                    bookmarkDict[pageNum] = formattedName;
+                    // update bookmark icon
+                    document.getElementById('bookmark-icon').src = bookmarkedIcon;
+
+                    // add new li item to the bookmark dropdown list with the new bookmark button
+                    var link = $('<button>', {
+                        id: pageNum,
+                        class: 'bookmark-list-items-button',
+                        type: 'button'
+                    });
+                    var listItem = $('<li>', {
+                        id: 'bookmark-page' + pageNum,
+                        class: 'existing-bookmark-unordered-list-item'
+                    });
+                    link.appendTo(listItem);
+                    listItem.appendTo('#existing-bookmark-unordered-list');
+
+                    // add textContent and EventListener to new button
+                    document.getElementById(pageNum).textContent = formattedName + " | " + " Page " + pageNum;
+                    let bmButtons = document.getElementsByClassName('bookmark-list-items-button');
+                    Array.from(bmButtons).forEach(function (element) {
+                        element.addEventListener('click', function () {
+                            navigateToBookmarkPage(parseInt(element.id));
+                        }, false)
+                    });
+                    document.getElementById('remove-cancel-bookmark').textContent = "Remove";
+                    hideBookmarkForm(); // the change was successful, hide the pop-up bookmark form.
+                    // !!!UPDATE DATABASE GOES HERE!!!
+                    updateBookmarkDict();
+                }
+            }
+        }
+        document.getElementById('create-edit-bookmark').addEventListener('click', addEditBookmark);
+
+        /**
+         * Cancels the creation of a new bookmark or deletes an existing bookmark
+         * @param type
+         */
+        function cancelRemoveBookmark() {
+            var newBookmarkName = document.getElementById("input-bookmark-name").value;
+            var type = document.getElementById('remove-cancel-bookmark').textContent;
+            if(type === "Remove") {
+
+                bookmarkDict[pageNum] = ""; // delete Bookmark name entry from the dictionary
+                // delete bookmark from dropdown list
+                var liObj = document.getElementById("bookmark-page" + pageNum);
+                liObj.remove();
+                document.getElementById('remove-cancel-bookmark').textContent = "Cancel"; // changes the button text to Cancel instead of Remove.
+                // !!!UPDATE THE DATABASE GOES HERE!!!
+                updateBookmarkDict();
+            }
+            // Reset values to default
+            document.getElementById('bookmark-icon').src = nonBookmarkedIcon;
+            document.getElementById('input-bookmark-name').value = "";
+            hideBookmarkForm();
+        }
+        document.getElementById('remove-cancel-bookmark').addEventListener('click', cancelRemoveBookmark);
+
+        var stage = new Konva.Stage({
+            container: "annotating-canvas",
+            width: 489,
+            height: 633
+        });
+
+        // Konva canvas element (default until annotation load)
+        var layer = new Konva.Layer();
+        stage.add(layer);
+
+        // Set id to new Konva canvas element (Not part of public API)
+        // https://stackoverflow.com/questions/57965335/how-to-add-an-id-to-canvas-generated-by-konva
+        const anntCanvas = layer.getCanvas()._canvas;
+        anntCanvas.id = 'annotation-canvas';
+
+        var transformer = new Konva.Transformer();
+        layer.add(transformer);
+
+        let selectedObject; // Currently selected object
+
+        /* Stage listener handling all selection behavior on the canvas */
+        stage.on('click tap', function (e) {
+            // if click on empty area - remove all selections
+            if (e.target === stage) {
+                if (document.getElementById('existing-text-area') !== null) {
+                    selectedObject.text(textarea.value);
+                    selectedObject.fontSize(document.getElementById('edit-font-size').value);
+                    if (document.getElementById('existing-text-area') !== null) {
+                        document.getElementById('existing-text-area').remove();
+                    }
+                    selectedObject.show();
+                }
+                transformer.nodes([]);
+                selectedObject = "";
+                document.getElementById("object-attribute-editing-toolbar-container").style.display = "none";
+                return;
+            } else {
+                if (e.target.name() === 'Line') {
+                    var MAX_HEIGHT = 10;
+                    transformer.boundBoxFunc(function (oldBoundBox, newBoundBox) {
+                        if (Math.abs(newBoundBox.height) > MAX_HEIGHT) {
+                            return oldBoundBox;
+                        }
+                        return newBoundBox;
+                    });
+                    transformer.enabledAnchors(['middle-left', 'middle-right', 'top-center', 'bottom-center']);
+                } else if (e.target.name() === 'TextBox') {
+                    transformer.boundBoxFunc(function (oldBox, newBox) {
+                        newBox.width = Math.max(30, newBox.width);
+                        return newBox;
+                    });
+                    transformer.enabledAnchors(['middle-left', 'middle-right']);
+                } else {
+                    transformer.boundBoxFunc(function (oldBoundBox, newBoundBox) {
+                        if (Math.abs(newBoundBox.height) > stage.height()) {
+                            return oldBoundBox;
+                        }
+                        return newBoundBox;
+                    });
+                    transformer.enabledAnchors(['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right']);
+                }
+
+                const isSelected = transformer.nodes();
+                if (isSelected.length === 0) {
+                    // nothing is selected, a new selection can be made
+                    if (e.target.name() === 'TextBox') {
+
+                        const oldNodes = transformer.nodes();
+                        const newNodes = oldNodes.concat([e.target]);
+                        transformer.nodes(newNodes);
+                        selectedObject = e.target;
+
+                        e.target.hide();
+
+                        enableShapeEditingToolbar();
+                        document.getElementById("object-attribute-editing-toolbar-container").style.display = "block";
+                        document.getElementById('edit-font-size').value = e.target.fontSize();
+
+                        var textPos = e.target.absolutePosition();
+                        var areaPos = {
+                            x: stage.container().offsetLeft + textPos.x,
+                            y: stage.container().offsetTop + textPos.y,
+                        };
+
+                        textarea = document.createElement('textarea');
+                        document.body.appendChild(textarea);
+                        textarea.id = 'existing-text-area';
+                        textarea.value = e.target.text();
+
+                        textarea.style.position = 'absolute';
+                        textarea.style.top = areaPos.y + 'px';
+                        textarea.style.left = areaPos.x + 'px';
+                        textarea.style.width = e.target.width() - e.target.padding() * 2 + 'px';
+                        textarea.style.height = e.target.height() - e.target.padding() * 2 + 5 + 'px';
+                        textarea.style.fontSize = e.target.fontSize() + 'px';
+                        textarea.style.border = 'none';
+                        textarea.style.padding = '0px';
+                        textarea.style.margin = '0px';
+                        textarea.style.overflow = 'hidden';
+                        textarea.style.background = 'none';
+                        textarea.style.outline = 'none';
+                        textarea.style.resize = 'none';
+                        textarea.style.lineHeight = e.target.lineHeight();
+                        textarea.style.fontFamily = e.target.fontFamily();
+                        if (e.target.fontStyle() === 'italic bold') {
+                            textarea.style.fontStyle = 'italic';
+                            textarea.style.fontWeight = 'bold';
+                            textarea.style.textDecoration = 'none';
+                        } else if (e.target.fontStyle() === 'italic') {
+                            textarea.style.fontStyle = 'italic';
+                            textarea.style.fontWeight = 'normal';
+                            textarea.style.textDecoration = 'none';
+                        } else if (e.target.fontStyle() === 'bold') {
+                            textarea.style.fontStyle = 'normal';
+                            textarea.style.fontWeight = 'bold';
+                            textarea.style.textDecoration = 'none';
+                        }
+                        if (e.target.textDecoration() === 'underline') {
+                            textarea.style.fontStyle = 'normal';
+                            textarea.style.fontWeight = 'normal';
+                            textarea.style.textDecoration = 'underline';
+                        }
+                        textarea.style.opacity = e.target.opacity();
+                        textarea.style.transformOrigin = 'left top';
+                        textarea.style.textAlign = e.target.align();
+                        textarea.style.color = e.target.fill();
+                        rotation = e.target.rotation();
+                        var transform = '';
+                        if (rotation) {
+                            transform += 'rotateZ(' + rotation + 'deg)';
+                        }
+
+                        var px = 0;
+                        var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+                        if (isFirefox) {
+                            px += 2 + Math.round(e.target.fontSize() / 20);
+                        }
+
+                        transform += 'translateY(-' + px + 'px)';
+                        textarea.style.transform = transform;
+                        textarea.style.height = 'auto';
+                        textarea.style.height = textarea.scrollHeight + 3 + 'px';
+                        textarea.focus();
+
+                        function removeTextarea() {
+                            textarea.parentNode.removeChild(textarea);
+                            textNode.show();
+                            transformer.hide();
+                            transformer.forceUpdate();
+                            selectedObject = "";
+                            document.getElementById("object-attribute-editing-toolbar-container").style.display = "none";
+                        }
+
+                        function setTextareaWidth(newWidth) {
+                            if (!newWidth) {
+                                newWidth = e.target.placeholder.length * e.target.fontSize();
+                            }
+                            var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+                            var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+                            if (isSafari || isFirefox) {
+                                newWidth = Math.ceil(newWidth);
+                            }
+
+                            var isEdge = document.documentMode || /Edge/.test(navigator.userAgent);
+                            if (isEdge) {
+                                newWidth += 1;
+                            }
+                            textarea.style.width = newWidth + 'px';
+                        }
+
+                        textarea.addEventListener('keydown', function (key) {
+                          if (key.keyCode === 13 && key.shiftKey) {
+                            scale = e.target.getAbsoluteScale().x;
+                            setTextareaWidth(e.target.width() * scale);
+                            textarea.style.height = 'auto';
+                            textarea.style.height = textarea.scrollHeight + e.target.fontSize() + 'px';
+                            e.target.text(textarea.value + 'x\n'); // 'x\n' acts as a random buffer to ensure the transformer reacts in realtime. It will be removed upon deselection;
+                          } else if (key.keyCode === 13) {
+                            if (document.getElementById('existing-text-area') !== null) {
+                                selectedObject.text(textarea.value);
+                                selectedObject.fontSize(document.getElementById('edit-font-size').value);
+                                if (document.getElementById('existing-text-area') !== null) {
+                                    document.getElementById('existing-text-area').remove();
+                                }
+                                selectedObject.show();
+                            }
+                            transformer.nodes([]);
+                            selectedObject = "";
+                            document.getElementById("object-attribute-editing-toolbar-container").style.display = "none";
+                            return;
+                          }
+                        });
+
+                        textarea.addEventListener('keydown', function (key) {
+                          if (key.keyCode !== 13) {
+                            scale = e.target.getAbsoluteScale().x;
+                            setTextareaWidth(e.target.width() * scale);
+                            textarea.style.height = 'auto';
+                            textarea.style.height = textarea.scrollHeight + e.target.fontSize() + 'px';
+                            e.target.text(textarea.value + 'x'); // 'x' acts as a random buffer to ensure the transformer reacts in realtime. It will be removed upon deselection
+                          }
+                        });
+
+                        return;
+                    } else { // any other object
+                        const oldNodes = transformer.nodes();
+                        const newNodes = oldNodes.concat([e.target]);
+                        transformer.nodes(newNodes);
+                        selectedObject = e.target;
+                        enableShapeEditingToolbar();
+                        document.getElementById("object-attribute-editing-toolbar-container").style.display = "block";
+                        return;
+                    }
+                } else if (isSelected.length > 0 && selectedObject !== e.target) {
+                    // a node is currently selected -> switch it from selection with the new node
+                    if (selectedObject.name() === 'TextBox' && e.target.name() === 'TextBox') {
+                        // console.log("FROM ONE TEXT BOX TO ANOTHER TEXT BOX");
+                        selectedObject.text(textarea.value);
+                        selectedObject.fontSize(document.getElementById('edit-font-size').value);
+                        selectedObject.show();
+                        if (document.getElementById('existing-text-area') !== null) {
+                            document.getElementById('existing-text-area').remove();
+                        }
+                        // console.log('NEWLY SELECTED TEXT BOX IN PROCESS');
+
+                        const oldNodes = transformer.nodes();
+                        const newNodes = oldNodes.concat([e.target]);
+                        transformer.nodes(newNodes);
+                        selectedObject = e.target;
+
+                        e.target.hide();
+
+                        enableShapeEditingToolbar();
+                        document.getElementById("object-attribute-editing-toolbar-container").style.display = "block";
+                        document.getElementById('edit-font-size').value = e.target.fontSize();
+
+                        var textPos = e.target.absolutePosition();
+                        var areaPos = {
+                            x: stage.container().offsetLeft + textPos.x,
+                            y: stage.container().offsetTop + textPos.y,
+                        };
+
+                        textarea = document.createElement('textarea');
+                        document.body.appendChild(textarea);
+                        textarea.id = 'existing-text-area';
+                        textarea.value = e.target.text();
+
+                        textarea.style.position = 'absolute';
+                        textarea.style.top = areaPos.y + 'px';
+                        textarea.style.left = areaPos.x + 'px';
+                        textarea.style.width = e.target.width() - e.target.padding() * 2 + 'px';
+                        textarea.style.height = e.target.height() - e.target.padding() * 2 + 5 + 'px';
+                        textarea.style.fontSize = e.target.fontSize() + 'px';
+                        textarea.style.border = 'none';
+                        textarea.style.padding = '0px';
+                        textarea.style.margin = '0px';
+                        textarea.style.overflow = 'hidden';
+                        textarea.style.background = 'none';
+                        textarea.style.outline = 'none';
+                        textarea.style.resize = 'none';
+                        textarea.style.lineHeight = e.target.lineHeight();
+                        textarea.style.fontFamily = e.target.fontFamily();
+                        if (e.target.fontStyle() === 'italic bold') {
+                            textarea.style.fontStyle = 'italic';
+                            textarea.style.fontWeight = 'bold';
+                            textarea.style.textDecoration = 'none';
+                        } else if (e.target.fontStyle() === 'italic') {
+                            textarea.style.fontStyle = 'italic';
+                            textarea.style.fontWeight = 'normal';
+                            textarea.style.textDecoration = 'none';
+                        } else if (e.target.fontStyle() === 'bold') {
+                            textarea.style.fontStyle = 'normal';
+                            textarea.style.fontWeight = 'bold';
+                            textarea.style.textDecoration = 'none';
+                        }
+                        if (e.target.textDecoration() === 'underline') {
+                            textarea.style.fontStyle = 'normal';
+                            textarea.style.fontWeight = 'normal';
+                            textarea.style.textDecoration = 'underline';
+                        }
+                        textarea.style.opacity = e.target.opacity();
+                        textarea.style.transformOrigin = 'left top';
+                        textarea.style.textAlign = e.target.align();
+                        textarea.style.color = e.target.fill();
+                        rotation = e.target.rotation();
+                        var transform = '';
+                        if (rotation) {
+                            transform += 'rotateZ(' + rotation + 'deg)';
+                        }
+
+                        var px = 0;
+                        var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+                        if (isFirefox) {
+                            px += 2 + Math.round(e.target.fontSize() / 20);
+                        }
+
+                        transform += 'translateY(-' + px + 'px)';
+                        textarea.style.transform = transform;
+                        textarea.style.height = 'auto';
+                        textarea.style.height = textarea.scrollHeight + 3 + 'px';
+                        textarea.focus();
+
+                        function removeTextarea() {
+                            textarea.parentNode.removeChild(textarea);
+                            textNode.show();
+                            transformer.hide();
+                            transformer.forceUpdate();
+                            selectedObject = "";
+                            document.getElementById("object-attribute-editing-toolbar-container").style.display = "none";
+                        }
+
+                        function setTextareaWidth(newWidth) {
+                            if (!newWidth) {
+                                newWidth = e.target.placeholder.length * e.target.fontSize();
+                            }
+                            var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+                            var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+                            if (isSafari || isFirefox) {
+                                newWidth = Math.ceil(newWidth);
+                            }
+
+                            var isEdge = document.documentMode || /Edge/.test(navigator.userAgent);
+                            if (isEdge) {
+                                newWidth += 1;
+                            }
+                            textarea.style.width = newWidth + 'px';
+                        }
+
+                        textarea.addEventListener('keydown', function (key) {
+                          if (key.keyCode === 13 && key.shiftKey) {
+                            scale = e.target.getAbsoluteScale().x;
+                            setTextareaWidth(e.target.width() * scale);
+                            textarea.style.height = 'auto';
+                            textarea.style.height = textarea.scrollHeight + e.target.fontSize() + 'px';
+                            e.target.text(textarea.value + 'x\n'); // 'x\n' acts as a random buffer to ensure the transformer reacts in realtime. It will be removed upon deselection;
+                          } else if (key.keyCode === 13) {
+                            if (document.getElementById('existing-text-area') !== null) {
+                                selectedObject.text(textarea.value);
+                                selectedObject.fontSize(document.getElementById('edit-font-size').value);
+                                if (document.getElementById('existing-text-area') !== null) {
+                                    document.getElementById('existing-text-area').remove();
+                                }
+                                selectedObject.show();
+                            }
+                            transformer.nodes([]);
+                            selectedObject = "";
+                            document.getElementById("object-attribute-editing-toolbar-container").style.display = "none";
+                            return;
+                          }
+                        });
+
+                        textarea.addEventListener('keydown', function (key) {
+                          if (key.keyCode !== 13) {
+                            scale = e.target.getAbsoluteScale().x;
+                            setTextareaWidth(e.target.width() * scale);
+                            textarea.style.height = 'auto';
+                            textarea.style.height = textarea.scrollHeight + e.target.fontSize() + 'px';
+                            e.target.text(textarea.value + 'x'); // 'x' acts as a random buffer to ensure the transformer reacts in realtime. It will be removed upon deselection
+                          }
+                        });
+
+
+                    } else if (selectedObject.name() === 'TextBox') {
+                        // console.log("FROM ONE TEXT BOX TO ANOTHER ELEMENT BUT NOT A TEXT BOX");
+                        selectedObject.text(textarea.value);
+                        selectedObject.fontSize(document.getElementById('edit-font-size').value);
+                        selectedObject.show();
+                        if (document.getElementById('existing-text-area') !== null) {
+                            document.getElementById('existing-text-area').remove();
+                        }
+                    } else if (e.target.name() === 'TextBox') {
+                        // console.log("FROM ANOTHER ELEMENT BUT NOT A TEXT BOX TO A NEWLY SELECTED TEXT BOX");
+                        const oldNodes = transformer.nodes();
+                        const newNodes = oldNodes.concat([e.target]);
+                        transformer.nodes(newNodes);
+                        selectedObject = e.target;
+
+                        e.target.hide();
+
+                        enableShapeEditingToolbar();
+                        document.getElementById("object-attribute-editing-toolbar-container").style.display = "block";
+                        document.getElementById('edit-font-size').value = e.target.fontSize();
+
+                        var textPos = e.target.absolutePosition();
+                        var areaPos = {
+                            x: stage.container().offsetLeft + textPos.x,
+                            y: stage.container().offsetTop + textPos.y,
+                        };
+
+                        textarea = document.createElement('textarea');
+                        document.body.appendChild(textarea);
+                        textarea.id = 'existing-text-area';
+                        textarea.value = e.target.text();
+
+                        textarea.style.position = 'absolute';
+                        textarea.style.top = areaPos.y + 'px';
+                        textarea.style.left = areaPos.x + 'px';
+                        textarea.style.width = e.target.width() - e.target.padding() * 2 + 'px';
+                        textarea.style.height = e.target.height() - e.target.padding() * 2 + 5 + 'px';
+                        textarea.style.fontSize = e.target.fontSize() + 'px';
+                        textarea.style.border = 'none';
+                        textarea.style.padding = '0px';
+                        textarea.style.margin = '0px';
+                        textarea.style.overflow = 'hidden';
+                        textarea.style.background = 'none';
+                        textarea.style.outline = 'none';
+                        textarea.style.resize = 'none';
+                        textarea.style.lineHeight = e.target.lineHeight();
+                        textarea.style.fontFamily = e.target.fontFamily();
+                        if (e.target.fontStyle() === 'italic bold') {
+                            textarea.style.fontStyle = 'italic';
+                            textarea.style.fontWeight = 'bold';
+                            textarea.style.textDecoration = 'none';
+                        } else if (e.target.fontStyle() === 'italic') {
+                            textarea.style.fontStyle = 'italic';
+                            textarea.style.fontWeight = 'normal';
+                            textarea.style.textDecoration = 'none';
+                        } else if (e.target.fontStyle() === 'bold') {
+                            textarea.style.fontStyle = 'normal';
+                            textarea.style.fontWeight = 'bold';
+                            textarea.style.textDecoration = 'none';
+                        }
+                        if (e.target.textDecoration() === 'underline') {
+                            textarea.style.fontStyle = 'normal';
+                            textarea.style.fontWeight = 'normal';
+                            textarea.style.textDecoration = 'underline';
+                        }
+                        textarea.style.opacity = e.target.opacity();
+                        textarea.style.transformOrigin = 'left top';
+                        textarea.style.textAlign = e.target.align();
+                        textarea.style.color = e.target.fill();
+                        rotation = e.target.rotation();
+                        var transform = '';
+                        if (rotation) {
+                            transform += 'rotateZ(' + rotation + 'deg)';
+                        }
+
+                        var px = 0;
+                        var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+                        if (isFirefox) {
+                            px += 2 + Math.round(e.target.fontSize() / 20);
+                        }
+
+                        transform += 'translateY(-' + px + 'px)';
+                        textarea.style.transform = transform;
+                        textarea.style.height = 'auto';
+                        textarea.style.height = textarea.scrollHeight + 3 + 'px';
+                        textarea.focus();
+
+                        function removeTextarea() {
+                            textarea.parentNode.removeChild(textarea);
+                            textNode.show();
+                            transformer.hide();
+                            transformer.forceUpdate();
+                            selectedObject = "";
+                            document.getElementById("object-attribute-editing-toolbar-container").style.display = "none";
+                        }
+
+                        function setTextareaWidth(newWidth) {
+                            if (!newWidth) {
+                                newWidth = e.target.placeholder.length * e.target.fontSize();
+                            }
+                            var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+                            var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+                            if (isSafari || isFirefox) {
+                                newWidth = Math.ceil(newWidth);
+                            }
+
+                            var isEdge = document.documentMode || /Edge/.test(navigator.userAgent);
+                            if (isEdge) {
+                                newWidth += 1;
+                            }
+                            textarea.style.width = newWidth + 'px';
+                        }
+
+                        textarea.addEventListener('keydown', function (key) {
+                          if (key.keyCode === 13 && key.shiftKey) {
+                            scale = e.target.getAbsoluteScale().x;
+                            setTextareaWidth(e.target.width() * scale);
+                            textarea.style.height = 'auto';
+                            textarea.style.height = textarea.scrollHeight + e.target.fontSize() + 'px';
+                            e.target.text(textarea.value + 'x\n'); // 'x\n' acts as a random buffer to ensure the transformer reacts in realtime. It will be removed upon deselection;
+                          } else if (key.keyCode === 13) {
+                            if (document.getElementById('existing-text-area') !== null) {
+                                selectedObject.text(textarea.value);
+                                selectedObject.fontSize(document.getElementById('edit-font-size').value);
+                                if (document.getElementById('existing-text-area') !== null) {
+                                    document.getElementById('existing-text-area').remove();
+                                }
+                                selectedObject.show();
+                            }
+                            transformer.nodes([]);
+                            selectedObject = "";
+                            document.getElementById("object-attribute-editing-toolbar-container").style.display = "none";
+                            return;
+                          }
+                        });
+
+                        textarea.addEventListener('keydown', function (key) {
+                          if (key.keyCode !== 13) {
+                            scale = e.target.getAbsoluteScale().x;
+                            setTextareaWidth(e.target.width() * scale);
+                            textarea.style.height = 'auto';
+                            textarea.style.height = textarea.scrollHeight + e.target.fontSize() + 'px';
+                            e.target.text(textarea.value + 'x'); // 'x' acts as a random buffer to ensure the transformer reacts in realtime. It will be removed upon deselection
+                          }
+                        });
+                    }
+                    const newNodes = [e.target];
+                    transformer.nodes(newNodes);
+                    selectedObject = e.target;
+                    enableShapeEditingToolbar();
+                    document.getElementById("object-attribute-editing-toolbar-container").style.display = "block";
+                    return;
+                } else if (isSelected.length > 0 && selectedObject === e.target) {
+                    if (selectedObject.name() === 'TextBox') {
+                        return; // do nothing since the user is inputting text at the moment
+                    }
+                    transformer.nodes([]);
+                    selectedObject = "";
+                    document.getElementById("object-attribute-editing-toolbar-container").style.display = "none";
+                    return;
+                }
+
+            }
+        });
+
+
+        // TEXT BOX INSERTION
+        let textarea; // The text area HTML Element that holds the inputed text within the textbox
+        function addTextBox() {
+
+            var textNode = new Konva.Text({
+                text: 'Some text here',
+                x: 50,
+                y: 80,
+                fontSize: 12,
+                draggable: true,
+                width: 200,
+                name: 'TextBox',
+                id: currentAnnotation.name
+            });
+
+            transformer.boundBoxFunc(function (oldBox, newBox) {
+                newBox.width = Math.max(30, newBox.width);
+                return newBox;
+            });
+
+            transformer.enabledAnchors(['middle-left', 'middle-right']);
+
+            textNode.on('transform', function () {
+                textNode.setAttrs({
+                    width: textNode.width() * textNode.scaleX(),
+                    scaleX: 1,
+                });
+            });
+
+            textNode.on('mouseover', function () {
+                document.body.style.cursor = 'pointer';
+            });
+
+            textNode.on('mouseleave', function () {
+                document.body.style.cursor = 'default';
+            });
+
+            textNode.on('transformend', function () { // Handles resizing of element (not positioning or visual attribute editing though)
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+              redoHistory.push(layer.toJSON());
+            });
+
+            textNode.on('dragend', function () {
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+              redoHistory.push(layer.toJSON());
+            });
+
+            layer.add(textNode);
+            transformer.nodes([]); // do not select on creation and remove existing selection if present
+            layer.draw();
+
+            selectedObject = ""; // do not select on creation and remove existing selection if present
+
+            document.getElementById('edit-font-size').addEventListener('change', function () {
+                textNode.fontSize(document.getElementById('edit-font-size').value);
+                document.getElementById('existing-text-area').style.fontSize = document.getElementById('edit-font-size').value + 'px';
+                document.getElementById('existing-text-area').style.width = textNode.width() - textNode.padding() * 2 + 'px';
+                document.getElementById('existing-text-area').style.height = textNode.height() - textNode.padding() * 2 + 5 + 'px';
+            });
+            currentAnnotation.changes.push(layer.toJSON()); // after change
+            redoHistory.push(layer.toJSON());
+        }
+        document.getElementById("add-text-box").addEventListener('click', addTextBox);
+
+        // ADD SHAPES
+        function addRectangle() {
+            let rectangle = new Konva.Rect({
+                x: 60,
+                y: 60,
+                width: 160,
+                height: 100,
+                stroke: 'black',
+                draggable: true,
+                name: 'Rectangle',
+                id: currentAnnotation.name
+            });
+
+            rectangle.on('mouseover', function () {
+                document.body.style.cursor = 'move';
+            });
+
+            rectangle.on('mouseleave', function () {
+                document.body.style.cursor = 'default';
+            });
+
+            rectangle.on('transformend', function () { // Handles resizing of element (not positioning or visual attribute editing though)
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+              redoHistory.push(layer.toJSON());
+            });
+
+            rectangle.on('dragend', function () {
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+              redoHistory.push(layer.toJSON());
+            });
+
+            transformer.boundBoxFunc(function (oldBoundBox, newBoundBox) {
+                if (Math.abs(newBoundBox.height) > stage.height()) {
+                    return oldBoundBox;
+                }
+                return newBoundBox;
+            });
+            transformer.enabledAnchors(['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right']);
+
+            layer.add(rectangle);
+            transformer.nodes([rectangle]);
+            layer.draw();
+
+            selectedObject = rectangle;
+
+            enableShapeEditingToolbar();
+            document.getElementById("object-attribute-editing-toolbar-container").style.display = "block";
+        }
+
+        function addCircle () {
+            var circle = new Konva.Circle({
+                x: 120,
+                y: 120,
+                radius: 70,
+                stroke: 'black',
+                draggable: true,
+                name: 'Circle',
+                id: currentAnnotation.name
+            });
+
+            circle.on('mouseover', function () {
+                document.body.style.cursor = 'move';
+            });
+
+            circle.on('mouseleave', function () {
+                document.body.style.cursor = 'default';
+            });
+
+            circle.on('transformend', function () { // Handles resizing of element (not positioning or visual attribute editing though)
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+            });
+
+            circle.on('dragend', function () {
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+            });
+
+            transformer.boundBoxFunc(function (oldBoundBox, newBoundBox) {
+                if (Math.abs(newBoundBox.height) > stage.height()) {
+                    return oldBoundBox;
+                }
+                return newBoundBox;
+            });
+            transformer.enabledAnchors(['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right']);
+
+            layer.add(circle);
+            transformer.nodes([circle]);
+            layer.draw();
+
+            selectedObject = circle;
+
+            enableShapeEditingToolbar();
+            document.getElementById("object-attribute-editing-toolbar-container").style.display = "block";
+        }
+
+        function addTriangle () {
+            var triangle = new Konva.RegularPolygon({
+                x: 120,
+                y: 120,
+                radius: 60,
+                sides: 3,
+                stroke: 'black',
+                draggable: true,
+                name: 'Triangle',
+                id: currentAnnotation.name
+            });
+
+            triangle.on('mouseover', function () {
+                document.body.style.cursor = 'move';
+            });
+
+            triangle.on('mouseleave', function () {
+                document.body.style.cursor = 'default';
+            });
+
+            triangle.on('transformend', function () { // Handles resizing of element (not positioning or visual attribute editing though)
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+            });
+
+            triangle.on('dragend', function () {
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+            });
+
+            transformer.boundBoxFunc(function (oldBoundBox, newBoundBox) {
+                if (Math.abs(newBoundBox.height) > stage.height()) {
+                    return oldBoundBox;
+                }
+                return newBoundBox;
+            });
+            transformer.enabledAnchors(['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right']);
+
+            layer.add(triangle);
+            transformer.nodes([triangle]);
+            layer.draw();
+
+            selectedObject = triangle;
+
+            enableShapeEditingToolbar();
+            document.getElementById("object-attribute-editing-toolbar-container").style.display = "block";
+        }
+
+        function addStar () {
+            var star = new Konva.Star({
+                x: 120,
+                y: 120,
+                numPoints: 5,
+                innerRadius: 40,
+                outerRadius: 70,
+                fill: 'black',
+                stroke: 'black',
+                strokeWidth: 4,
+                draggable: true,
+                name: 'Star',
+                id: currentAnnotation.name
+            });
+
+            star.on('mouseover', function () {
+                document.body.style.cursor = 'move';
+            });
+
+            star.on('mouseleave', function () {
+                document.body.style.cursor = 'default';
+            });
+
+            star.on('transformend', function () { // Handles resizing of element (not positioning or visual attribute editing though)
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+            });
+
+            star.on('dragend', function () {
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+            });
+
+            transformer.boundBoxFunc(function (oldBoundBox, newBoundBox) {
+                if (Math.abs(newBoundBox.height) > stage.height()) {
+                    return oldBoundBox;
+                }
+                return newBoundBox;
+            });
+            transformer.enabledAnchors(['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right']);
+
+            layer.add(star);
+            transformer.nodes([star]);
+            layer.draw();
+
+            selectedObject = star;
+
+            enableShapeEditingToolbar();
+            document.getElementById("object-attribute-editing-toolbar-container").style.display = "block";
+        }
+
+        function addLine () {
+            var line = new Konva.Line({
+                x: 120,
+                y: 120,
+                points: [0, 0, 90, 0],
+                stroke: 'black',
+                lineCap: 'butt',
+                lineJoin: 'butt',
+                draggable: true,
+                name: 'Line',
+                id: currentAnnotation.name
+            });
+
+            line.on('mouseover', function () {
+                document.body.style.cursor = 'move';
+            });
+
+            line.on('mouseleave', function () {
+                document.body.style.cursor = 'default';
+            });
+
+            line.on('transformend', function () { // Handles resizing of element (not positioning or visual attribute editing though)
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+            });
+
+            line.on('dragend', function () {
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+            });
+
+            layer.add(line);
+
+            var MAX_HEIGHT = 10;
+            transformer.boundBoxFunc(function (oldBoundBox, newBoundBox) {
+                if (Math.abs(newBoundBox.height) > MAX_HEIGHT) {
+                    return oldBoundBox;
+                }
+                return newBoundBox;
+            });
+            transformer.enabledAnchors(['middle-left', 'middle-right', 'top-center', 'bottom-center']);
+
+            transformer.nodes([line]);
+            layer.draw();
+
+            selectedObject = line;
+
+            enableShapeEditingToolbar();
+            document.getElementById("object-attribute-editing-toolbar-container").style.display = "block";
+        }
+
+        function addArrow() {
+            var arrow = new Konva.Arrow({
+                x: 120,
+                y: 120,
+                points: [0, 0, 90, 0],
+                pointerLength: 20,
+                pointerWidth: 20,
+                fill: 'black',
+                stroke: 'black',
+                strokeWidth: 4,
+                draggable: true,
+                name: 'Arrow',
+                id: currentAnnotation.name
+            });
+
+            arrow.on('mouseover', function () {
+                document.body.style.cursor = 'move';
+            });
+
+            arrow.on('mouseleave', function () {
+                document.body.style.cursor = 'default';
+            });
+
+            arrow.on('transformend', function () { // Handles resizing of element (not positioning or visual attribute editing though)
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+            });
+
+            arrow.on('dragend', function () {
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+            });
+
+            transformer.boundBoxFunc(function (oldBoundBox, newBoundBox) {
+                if (Math.abs(newBoundBox.height) > stage.height()) {
+                    return oldBoundBox;
+                }
+                return newBoundBox;
+            });
+            transformer.enabledAnchors(['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right']);
+
+            layer.add(arrow);
+            transformer.nodes([arrow]);
+            layer.draw();
+
+            selectedObject = arrow;
+
+            enableShapeEditingToolbar();
+            document.getElementById("object-attribute-editing-toolbar-container").style.display = "block";
+        }
+
+        function addShape (shapeType) {
+
+            if (shapeType === "Rectangle") {
+                addRectangle();
+            } else if (shapeType === "Circle") {
+                addCircle();
+            } else if (shapeType === "Triangle") {
+                addTriangle();
+            } else if (shapeType === "Line") {
+                addLine();
+            } else if (shapeType === "Star") {
+                addStar();
+            } else {
+                addArrow();
+            }
+            document.getElementById("shapeDropdownList").style.display = "none";
+
+            currentAnnotation.changes.push(layer.toJSON());
+            redoHistory.push(layer.toJSON());
+            console.log(redoHistory);
+        }
+
+        let shapeOptions = document.getElementsByClassName('shape-item');
+        Array.from(shapeOptions).forEach(function (element) {
+            element.addEventListener('click', function() {
+                addShape(element.textContent);
+            }, false)
+        });
+
+        function shapeDropdownToggle() {
+            var list = document.getElementById("shapeDropdownList");
+            if (list.style.display === "none") {
+                list.style.display = "block";
+            } else {
+                list.style.display = "none";
+            }
+        }
+        document.getElementById("add-shape").addEventListener('click', shapeDropdownToggle);
+
+
+        // ADD IMAGES
+        function addImage (src) {
+          var image = new Image();
+          image.src = src;
+          image.onload = function () {
+              var imgObj = new Konva.Image({
+                  x: 120,
+                  y: 120,
+                  width: image.width / 2,
+                  height: image.height / 2,
+                  draggable: true,
+                  image: image,
+                  name: 'Image',
+                  id: currentAnnotation.name
+              });
+
+              imgObj.setAttr('src', src);
+
+              imgObj.on('mouseover', function () {
+                  document.body.style.cursor = 'move';
+              });
+
+              imgObj.on('mouseleave', function () {
+                  document.body.style.cursor = 'default';
+              });
+
+              imgObj.on('transformend', function () { // Handles resizing of element (not positioning or visual attribute editing though)
+                currentAnnotation.changes.push(layer.toJSON()); // after change
+              });
+
+              imgObj.on('dragend', function () {
+                currentAnnotation.changes.push(layer.toJSON()); // after change
+              });
+
+              transformer.boundBoxFunc(function (oldBoundBox, newBoundBox) {
+                  if (Math.abs(newBoundBox.height) > stage.height()) {
+                      return oldBoundBox;
+                  }
+                  return newBoundBox;
+              });
+              transformer.enabledAnchors(['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right']);
+
+              layer.add(imgObj);
+              transformer.nodes([imgObj]);
+              layer.draw();
+
+              selectedObject = imgObj;
+
+              enableShapeEditingToolbar();
+              document.getElementById("object-attribute-editing-toolbar-container").style.display = "block";
+
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+              redoHistory.push(layer.toJSON());
+          };
+        }
+
+        function getImageFromFile(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                let src;
+                reader.onload = function (e) {
+                    src = e.target.result;
+                     addImage(src);
+                };
+                addImage(src);
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        document.getElementById("add-image").addEventListener('click', getImageFromFile);
+
+
+        // HIGHLIGHTING
+        function highlightToggle() {
+            if (document.getElementById("highlight").textContent === "Highlight") {
+              document.getElementById("highlight").textContent = "Highlighting";
+              stage.on("mousedown", startHighlightPos);
+              stage.on("mousemove", highlight);
+              stage.on("mouseup", endHighlightPos);
+              document.body.style.cursor = 'crosshair';
+            } else {
+              stage.off("mousedown");
+              stage.off("mousemove");
+              stage.off("mouseup");
+              document.getElementById("highlight").textContent = "Highlight";
+              document.body.style.cursor = 'default';
+            }
+        }
+        document.getElementById("highlight").addEventListener('click', highlightToggle);
+
+        let highlighting = false;
+        let hLine = null;
+
+        function startHighlightPos() {
+
+
+            if (!highlighting && document.getElementById("highlight").textContent !== "Highlight") {
+
+                highlighting = true;
+                hLine = new Konva.Rect({
+                    x: stage.getPointerPosition().x,
+                    y: stage.getPointerPosition().y,
+                    width: 0,
+                    height: 0,
+                    fill: "yellow",
+                    tension: 1,
+                    opacity: 0.5,
+                    draggable: true,
+                    name: 'Rectangle',
+                    id: currentAnnotation.name
+                });
+
+                hLine.on('mouseover', function () {
+                    document.body.style.cursor = 'move';
+                });
+
+                hLine.on('mouseleave', function () {
+                    document.body.style.cursor = 'default';
+                });
+
+                hLine.on('transformend', function () { // Handles resizing of element (not positioning or visual attribute editing though)
+                  currentAnnotation.changes.push(layer.toJSON());
+                  redoHistory.push(layer.toJSON());
+                });
+
+                hLine.on('dragend', function () {
+                  currentAnnotation.changes.push(layer.toJSON());
+                  redoHistory.push(layer.toJSON());
+                });
+
+                transformer.boundBoxFunc(function (oldBoundBox, newBoundBox) {
+                    if (Math.abs(newBoundBox.height) > stage.height()) {
+                        return oldBoundBox;
+                    }
+                    return newBoundBox;
+                });
+
+                transformer.enabledAnchors(['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right']);
+
+                layer.add(hLine).batchDraw();
+                transformer.nodes([hLine]);
+
+                selectedObject = hLine;
+
+                enableShapeEditingToolbar();
+                document.getElementById("object-attribute-editing-toolbar-container").style.display = "block";
+            }
+        }
+
+        function endHighlightPos() {
+            highlighting = false;
+            document.getElementById("highlight").textContent = "Highlight";
+            currentAnnotation.changes.push(layer.toJSON());
+            redoHistory.push(layer.toJSON());
+
+            // Detach event listeners until next highlight selection
+            stage.off("mousedown");
+            stage.off("mousemove");
+            stage.off("mouseup");
+        }
+
+        function highlight() {
+            if (!highlighting || document.getElementById("highlight").textContent === "Highlight") {
+                return;
+            } else {
+                const newWidth = stage.getPointerPosition().x - hLine.x();
+                const newHeight = stage.getPointerPosition().y - hLine.y();
+                hLine.width(newWidth).height(newHeight);
+                layer.batchDraw();
+            }
+        }
+
+
+        // OBJECT DELETION
+        function deleteObject(object) {
+
+          if (object === "") { // no object is selected for deletion
+              return;
+          } else if (object.name() === 'TextBox') {
+              document.getElementById('existing-text-area').remove();
+              object.destroy();
+              layer.draw();
+              selectedObject = "";
+              document.getElementById("object-attribute-editing-toolbar-container").style.display = "none";
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+              redoHistory.push(layer.toJSON());
+          } else {
+              transformer.nodes([]); // removes all nodes from selection due to object deletion
+              object.destroy();
+              layer.draw();
+              selectedObject = "";
+              document.getElementById("object-attribute-editing-toolbar-container").style.display = "none";
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+              redoHistory.push(layer.toJSON());
+          }
+          transformer.nodes([]);
+        }
+        document.getElementById('delete-object').addEventListener('click',
+            function () {
+                deleteObject(selectedObject);
+            },
+            false
+        );
+
+
+        // SHAPE EDITING FUNCTIONALITY
+        function shapeAttributeEditingToolbar() {
+
+            var mainContainer = document.getElementById('object-attribute-editing-toolbar-container');
+
+            var tempContainer = $('<div>', {
+                id: 'temp-attribute-functions-container-other-shapes'
+            });
+
+            tempContainer.appendTo(mainContainer);
+
+            let attributeButtonList = [
+                ["edit-font-family", "Font Family"], // TextBox only
+                ["edit-font-size", "Font Size"], // TextBox only
+                ["edit-font-style", "Font Style"], // TextBox only
+
+
+                ["edit-stroke-color", "Stroke Color"], // Also font color for text! And border for images.
+                ["edit-stroke-width", "Stroke Width"],
+                ["edit-fill-color", "Fill Color"], // Also fill of arrow heads.
+                ["edit-opacity", "Opacity"]
+            ];
+
+            let attributeListList = ["fontFamilyDropdownList", "fontSizeLabel", "fontStyleDropdownList", "strokeColorDropdownList", "strokeWidthDropdownList", "fillColorDropdownList", "opacityDropdownList"];
+
+            let attributeItemsList = [
+                ['Arial', 'Calibri', 'Times New Roman'],
+                ['Placeholder Font Size Items List'],
+                ['Default', 'Bold', 'Italic', 'Italic Bold', 'Underline'],
+                ['black', 'grey', 'blue', 'yellow', 'red', 'purple', 'pink', 'green', 'orange', 'brown', 'violet', 'cyan'],
+                ['Default', 'High', 'Medium', 'Low'],
+                ['white', 'black', 'grey', 'blue', 'yellow', 'red', 'purple', 'pink', 'green', 'orange', 'brown', 'violet', 'cyan'],
+                ['Default', 'Medium', 'Low']
+            ];
+
+            for (let i = 0; i < attributeButtonList.length; i++) {
+
+                var subContainer = $('<div>', {
+                    class: 'attribute-function'
+                });
+
+                if (i === 1) {
+
+                    var input = $('<input>', {
+                        id: attributeButtonList[i][0],
+                        class: 'attribute-input',
+                        type: 'number',
+                        width: '40px'
+                    });
+
+                    input.appendTo(subContainer);
+                    subContainer.appendTo(tempContainer);
+
+                } else {
+
+                    var listContainer = $('<div>', {
+                        id: attributeListList[i],
+                        class: 'attribute-dropdown-content'
+                    });
+
+                    for (let j = 0; j < attributeItemsList[i].length; j++) {
+                        var listItem = $('<a>', {
+                            class: 'attribute-item'
+                        });
+                        listItem.text(attributeItemsList[i][j]);
+                        listItem.appendTo(listContainer);
+                    }
+
+                    var btn = $('<button>', {
+                        id: attributeButtonList[i][0],
+                        class: 'attribute-buttons',
+                        type: 'button'
+                    });
+
+                    btn.text(attributeButtonList[i][1]);
+                    btn.appendTo(subContainer);
+                    listContainer.appendTo(subContainer);
+                    subContainer.appendTo(tempContainer);
+
+                }
+            }
+            // Initial display assignment
+            document.getElementById("strokeColorDropdownList").style.display = "none";
+            document.getElementById("strokeWidthDropdownList").style.display = "none";
+            document.getElementById("fillColorDropdownList").style.display = "none";
+            document.getElementById("opacityDropdownList").style.display = "none";
+            document.getElementById("fontFamilyDropdownList").style.display = "none";
+            document.getElementById("fontStyleDropdownList").style.display = "none";
+
+
+            let attributeButtons = document.getElementsByClassName('attribute-buttons');
+            Array.from(attributeButtons).forEach(function (element) {
+                element.addEventListener('click', function () {
+                    if (element.id === 'edit-font-family') {
+                        toggleAttributeDropdownLists(document.getElementById("fontFamilyDropdownList"));
+                    } else if (element.id === 'edit-font-style') {
+                        toggleAttributeDropdownLists(document.getElementById("fontStyleDropdownList"));
+                    } else if (element.id === 'edit-stroke-color') {
+                        toggleAttributeDropdownLists(document.getElementById("strokeColorDropdownList"));
+                    } else if (element.id === 'edit-stroke-width') {
+                        toggleAttributeDropdownLists(document.getElementById("strokeWidthDropdownList"));
+                    } else if (element.id === 'edit-fill-color') {
+                        toggleAttributeDropdownLists(document.getElementById("fillColorDropdownList"));
+                    } else { // edit opacity
+                        toggleAttributeDropdownLists(document.getElementById("opacityDropdownList"));
+                    }
+                }, false)
+            });
+
+            $(".attribute-buttons").mouseover(
+              function() {
+                $(this).css("color", "#f77062");
+              }
+            );
+
+            $(".attribute-buttons").mouseleave(
+              function() {
+                $(this).css("color", "white");
+              }
+            );
+
+            $(".shape-item").mouseover(
+              function() {
+                $(body).css('cursor', 'pointer');
+                $(this).css('background-color', 'grey');
+              }
+            );
+
+            $(".shape-item").mouseleave(
+              function() {
+                $(body).css('cursor', 'default');
+                $(this).css('background-color', '#f1f1f1');
+              }
+            );
+
+            $(".attribute-item").mouseover(
+              function() {
+                $(body).css('cursor', 'pointer');
+                $(this).css('background-color', 'grey');
+              }
+            );
+
+            $(".attribute-item").mouseleave(
+              function() {
+                $(body).css('cursor', 'default');
+                $(this).css('background-color', '#f1f1f1');
+              }
+            );
+
+            let attributeItems = document.getElementsByClassName('attribute-item');
+            Array.from(attributeItems).forEach(function (element) {
+                element.addEventListener('click', function () {
+                    editAttribute(element.textContent, element.parentElement.id);
+                }, false)
+            });
+
+            document.getElementById("object-attribute-editing-toolbar-container").style.display = "none";
+            document.getElementById("temp-attribute-functions-container-other-shapes").style.textAlign = "center";
+
+        }
+
+        function toggleAttributeDropdownLists(list) {
+            if (list.style.display === "none") {
+                list.style.display = "block";
+            } else {
+                list.style.display = "none";
+            }
+        }
+
+        function editAttribute (newAttrVal, attr) {
+
+            document.getElementById(attr).style.display = "none";
+            if (selectedObject === "") {
+                return;
+            }
+
+            if (attr === "strokeColorDropdownList") {
+
+                selectedObject.stroke(newAttrVal);
+                if (selectedObject.name() === 'TextBox') {
+                    document.getElementById('existing-text-area').style.color = newAttrVal;
+                }
+
+            } else if (attr === "strokeWidthDropdownList") {
+
+                if (newAttrVal === "Default") {
+                    selectedObject.strokeWidth(2);
+                } else if (newAttrVal === "High") {
+                    selectedObject.strokeWidth(8);
+                } else if (newAttrVal === "Medium") {
+                    selectedObject.strokeWidth(6);
+                } else if (newAttrVal === "Low") {
+                    selectedObject.strokeWidth(4);
+                }
+
+            } else if (attr === "fillColorDropdownList") {
+
+                selectedObject.fill(newAttrVal);
+                if (selectedObject.name() === 'TextBox') {
+                    document.getElementById('existing-text-area').style.color = newAttrVal;
+                }
+
+            } else if (attr === "opacityDropdownList") {
+
+                if (newAttrVal === "Default") {
+                    selectedObject.opacity(1);
+                    if (selectedObject.name() === 'TextBox') {
+                        document.getElementById('existing-text-area').style.opacity = 1;
+                    }
+                } else if (newAttrVal === "Medium") {
+                    selectedObject.opacity(0.5);
+                    if (selectedObject.name() === 'TextBox') {
+                        document.getElementById('existing-text-area').style.opacity = 0.5;
+                    }
+                } else if (newAttrVal === "Low ") {
+                    selectedObject.opacity(0.25);
+                    if (selectedObject.name() === 'TextBox') {
+                        document.getElementById('existing-text-area').style.opacity = 0.25;
+                    }
+                }
+
+            } else if (attr === "fontFamilyDropdownList") {
+
+                selectedObject.fontFamily(newAttrVal);
+                document.getElementById('existing-text-area').style.fontFamily = newAttrVal;
+                document.getElementById('existing-text-area').style.width = selectedObject.width() - selectedObject.padding() * 2 + 'px';
+                document.getElementById('existing-text-area').style.height = selectedObject.height() - selectedObject.padding() * 2 + 5 + 'px';
+
+            } else if (attr === "fontStyleDropdownList") {
+
+                if (newAttrVal === 'Default') {
+                    document.getElementById('existing-text-area').style.fontStyle = 'normal';
+                    document.getElementById('existing-text-area').style.fontWeight = 'normal';
+                    document.getElementById('existing-text-area').style.textDecoration = 'none';
+                    selectedObject.fontStyle('normal');
+                    selectedObject.textDecoration('');
+                } else if (newAttrVal === 'Bold') {
+                    document.getElementById('existing-text-area').style.fontStyle = 'normal';
+                    document.getElementById('existing-text-area').style.fontWeight = 'bold';
+                    document.getElementById('existing-text-area').style.textDecoration = 'none';
+                    selectedObject.fontStyle('bold');
+                    selectedObject.textDecoration('');
+                } else if (newAttrVal === 'Italic') {
+                    document.getElementById('existing-text-area').style.fontStyle = 'italic';
+                    document.getElementById('existing-text-area').style.fontWeight = 'normal';
+                    document.getElementById('existing-text-area').style.textDecoration = 'none';
+                    selectedObject.fontStyle('italic');
+                    selectedObject.textDecoration('');
+                } else if (newAttrVal === 'Italic Bold') {
+                    document.getElementById('existing-text-area').style.fontStyle = 'italic';
+                    document.getElementById('existing-text-area').style.fontWeight = 'bold';
+                    document.getElementById('existing-text-area').style.textDecoration = 'none';
+                    selectedObject.fontStyle('italic bold');
+                    selectedObject.textDecoration('');
+                } else if (newAttrVal === 'Underline') {
+                    document.getElementById('existing-text-area').style.fontStyle = 'normal';
+                    document.getElementById('existing-text-area').style.fontWeight = 'normal';
+                    document.getElementById('existing-text-area').style.textDecoration = 'underline';
+                    selectedObject.fontStyle('normal');
+                    selectedObject.textDecoration('underline');
+                }
+            }
+            currentAnnotation.changes.push(layer.toJSON()); // after change
+            redoHistory.push(layer.toJSON());
+        }
+
+        function enableShapeEditingToolbar() {
+
+            if (selectedObject.name() === 'Line' || selectedObject.name() === 'Image') {
+                document.getElementById('edit-font-size').parentElement.style.display = 'none';
+                document.getElementById('edit-font-family').parentElement.style.display = 'none';
+                document.getElementById('edit-font-style').parentElement.style.display = 'none';
+                document.getElementById('edit-stroke-color').parentElement.style.display = 'inline-block';
+                document.getElementById('edit-stroke-width').parentElement.style.display = 'inline-block';
+                document.getElementById('edit-fill-color').parentElement.style.display = 'none';
+                document.getElementById('edit-opacity').parentElement.style.display = 'inline-block';
+            } else if (selectedObject.name() === "TextBox") {
+                document.getElementById('edit-font-size').parentElement.style.display = 'inline-block';
+                document.getElementById('edit-font-family').parentElement.style.display = 'inline-block';
+                document.getElementById('edit-font-style').parentElement.style.display = 'inline-block';
+                document.getElementById('edit-stroke-color').parentElement.style.display = 'none';
+                document.getElementById('edit-stroke-width').parentElement.style.display = 'none';
+                document.getElementById('edit-fill-color').parentElement.style.display = 'inline-block';
+                document.getElementById('edit-opacity').parentElement.style.display = 'none';
+            } else { // Any other shape
+                document.getElementById('edit-font-size').parentElement.style.display = 'none';
+                document.getElementById('edit-font-family').parentElement.style.display = 'none';
+                document.getElementById('edit-font-style').parentElement.style.display = 'none';
+                document.getElementById('edit-stroke-color').parentElement.style.display = 'inline-block';
+                document.getElementById('edit-stroke-width').parentElement.style.display = 'inline-block';
+                document.getElementById('edit-fill-color').parentElement.style.display = 'inline-block';
+                document.getElementById('edit-opacity').parentElement.style.display = 'inline-block';
+            }
+        }
+
+
+        // Clear Functionality
+        function clearCanvas() {
+          if (currentAnnotation !== null) {
+            // Destroy all elements on the layer
+            layer.destroyChildren();
+            // Add new transformer as the previous one is destroyed
+            var newTr = new Konva.Transformer();
+            layer.add(newTr);
+            transformer = newTr;
+            currentAnnotation.changes.push(layer.toJSON()); // after change
+            redoHistory.push(layer.toJSON());
+
+            // Handles textarea selection
+            transformer.nodes([]);
+            if (document.getElementById('existing-text-area') !== null) { // handling of textboxes
+                document.getElementById('existing-text-area').remove();
+                selectedObject.show();
+            }
+            // Not ideal but prevents thrown errors for now.
+            // Need event that determines if element is deleted on undo or to change undo behavior altogether by adding limits
+            document.getElementById('object-attribute-editing-toolbar-container').style.display = 'none';
+          }
+        }
+        document.getElementById('clear').addEventListener('click', clearCanvas);
+
+
+        // Undo/Redo Functionality
+        function undoChange() {
+          if (currentAnnotation !== null) {
+            if (currentAnnotation.changes.length > 1) {
+              let originalLayerIndex = currentAnnotation.changes.length - 1;
+              if (originalLayerIndex < 1) {
+                return; // End of stack, no previous versions left to load back in
+              } else {
+
+                // Handles textarea selection
+                if (document.getElementById('existing-text-area') !== null) { // handling of textboxes
+                    document.getElementById('existing-text-area').remove();
+                    selectedObject.show();
+                }
+                transformer.nodes([]);
+
+                let previousLayerNode = currentAnnotation.changes[originalLayerIndex - 1];
+
+                // Update annotation current layer to current layer
+                currentAnnotation.layer = layer.toJSON();
+
+                // Update stage
+                stage.destroyChildren();
+
+                // Deserialize .json layer to Konva.Layer object
+                let deserializedLayer = Konva.Node.create(previousLayerNode, 'konvajs-content');
+
+                // Update annotation current layer to previous layer
+                currentAnnotation.layer = previousLayerNode;
+
+                // Assign a new transformer to the layer (previous is deleted by stage.destroyChildren() call)
+                let deserializedLayerTransformer = new Konva.Transformer();
+
+                // Reassign layer tranformer variable
+                transformer = deserializedLayerTransformer;
+
+                // Reassign layer variable and add new transformer
+                layer = deserializedLayer;
+                layer.add(transformer);
+
+                // Deserialize images on layer (has to be done manually)
+                reloadAllLayerNodeEventListeners();
+
+                // Add layer of currentAnnotation to the static stage
+                stage.add(layer);
+                layer.batchDraw();
+
+                // Pop layer from Changes
+                currentAnnotation.changes.pop();
+
+                // Not ideal but prevents thrown errors for now.
+                // Need event that determines if element is deleted on undo or to change undo behavior altogether by adding limits
+                document.getElementById('object-attribute-editing-toolbar-container').style.display = 'none';
+              }
+            }
+          }
+        }
+        document.getElementById('undo').addEventListener('click', undoChange);
+
+        var redoHistory = [];
+        function redoChange() {
+          if (currentAnnotation !== null) {
+            let originalLayerIndex = currentAnnotation.changes.length - 1; // Last item in the undo array
+            if (currentAnnotation.changes.length === redoHistory.length) {
+              return; // Then no undo has been called yet. Redo needs to rely on undo to function properly
+            } else {
+              let previousLayerNode = redoHistory[originalLayerIndex + 1];
+
+              // Handles textarea selection
+              if (document.getElementById('existing-text-area') !== null) { // handling of textboxes
+                  document.getElementById('existing-text-area').remove();
+                  selectedObject.show();
+              }
+              transformer.nodes([]);
+
+              // Update annotation current layer to current layer
+              currentAnnotation.layer = layer.toJSON();
+
+              // Update stage
+              stage.destroyChildren();
+
+              // Deserialize .json layer to Konva.Layer object
+              let deserializedLayer = Konva.Node.create(previousLayerNode, 'konvajs-content');
+
+              // Update annotation current layer to previous layer
+              currentAnnotation.layer = previousLayerNode;
+
+              // Assign a new transformer to the layer (previous is deleted by stage.destroyChildren() call)
+              let deserializedLayerTransformer = new Konva.Transformer();
+
+              // Reassign layer tranformer variable
+              transformer = deserializedLayerTransformer;
+
+              // Reassign layer variable and add new transformer
+              layer = deserializedLayer;
+              layer.add(transformer);
+
+              // Deserialize images on layer (has to be done manually)
+              reloadAllLayerNodeEventListeners();
+
+              // Add layer of currentAnnotation to the static stage
+              stage.add(layer);
+              layer.batchDraw();
+
+              // Re-add layer into undo array
+              currentAnnotation.changes.push(layer.toJSON());
+
+              // Not ideal but prevents thrown errors for now.
+              // Need event that determines if element is deleted on undo or to change undo behavior altogether by adding limits
+              document.getElementById('object-attribute-editing-toolbar-container').style.display = 'none';
+            }
+          }
+        }
+        document.getElementById('redo').addEventListener('click', redoChange);
+
+        function reloadAllLayerNodeEventListeners() {
+
+          layer.find('Image').forEach((imageNode) => {
+            const src = imageNode.getAttr('src');
+            const image = new Image();
+            image.onload = () => {
+                imageNode.image(image);
+                imageNode.getLayer().batchDraw();
+                imageNode.on('mouseover', function () {
+                    document.body.style.cursor = 'move';
+                });
+
+                imageNode.on('mouseleave', function () {
+                    document.body.style.cursor = 'default';
+                });
+                imageNode.on('transformend', function () { // Handles resizing of element (not positioning or visual attribute editing though)
+                  currentAnnotation.changes.push(layer.toJSON()); // after change
+                  redoHistory.push(layer.toJSON());
+                });
+                imageNode.on('dragend', function () {
+                  currentAnnotation.changes.push(layer.toJSON()); // after change
+                  redoHistory.push(layer.toJSON());
+                });
+            }
+            image.src = src;
+          });
+
+          layer.find('Rect').forEach((rectangle) => {
+            rectangle.on('mouseover', function () {
+                document.body.style.cursor = 'move';
+            });
+
+            rectangle.on('mouseleave', function () {
+                document.body.style.cursor = 'default';
+            });
+
+            rectangle.on('transformend', function () { // Handles resizing of element (not positioning or visual attribute editing though)
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+              redoHistory.push(layer.toJSON());
+            });
+
+            rectangle.on('dragend', function () {
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+              redoHistory.push(layer.toJSON());
+            });
+          });
+
+          layer.find('Circle').forEach((circle) => {
+            circle.on('mouseover', function () {
+                document.body.style.cursor = 'move';
+            });
+
+            circle.on('mouseleave', function () {
+                document.body.style.cursor = 'default';
+            });
+
+            circle.on('transformend', function () { // Handles resizing of element (not positioning or visual attribute editing though)
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+              redoHistory.push(layer.toJSON());
+            });
+
+            circle.on('dragend', function () {
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+              redoHistory.push(layer.toJSON());
+            });
+          });
+
+          layer.find('RegularPolygon').forEach((regularPolygon) => {
+            regularPolygon.on('mouseover', function () {
+                document.body.style.cursor = 'move';
+            });
+
+            regularPolygon.on('mouseleave', function () {
+                document.body.style.cursor = 'default';
+            });
+
+            regularPolygon.on('transformend', function () { // Handles resizing of element (not positioning or visual attribute editing though)
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+              redoHistory.push(layer.toJSON());
+            });
+
+            regularPolygon.on('dragend', function () {
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+              redoHistory.push(layer.toJSON());
+            });
+          });
+
+          layer.find('Text').forEach((text) => {
+            text.on('mouseover', function () {
+                document.body.style.cursor = 'pointer';
+            });
+
+            text.on('mouseleave', function () {
+                document.body.style.cursor = 'default';
+            });
+
+            text.on('transformend', function () { // Handles resizing of element (not positioning or visual attribute editing though)
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+              redoHistory.push(layer.toJSON());
+            });
+
+            text.on('dragend', function () {
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+              redoHistory.push(layer.toJSON());
+            });
+
+            text.on('transform', function () {
+                text.setAttrs({
+                    width: text.width() * text.scaleX(),
+                    scaleX: 1,
+                });
+            });
+
+            document.getElementById('edit-font-size').addEventListener('change', function () {
+                text.fontSize(document.getElementById('edit-font-size').value);
+                document.getElementById('existing-text-area').style.fontSize = document.getElementById('edit-font-size').value + 'px';
+                document.getElementById('existing-text-area').style.width = text.width() - text.padding() * 2 + 'px';
+                document.getElementById('existing-text-area').style.height = text.height() - text.padding() * 2 + 5 + 'px';
+            });
+
+          });
+
+          layer.find('Arrow').forEach((arrow) => {
+            arrow.on('mouseover', function () {
+                document.body.style.cursor = 'move';
+            });
+
+            arrow.on('mouseleave', function () {
+                document.body.style.cursor = 'default';
+            });
+
+            arrow.on('transformend', function () { // Handles resizing of element (not positioning or visual attribute editing though)
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+              redoHistory.push(layer.toJSON());
+            });
+
+            arrow.on('dragend', function () {
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+              redoHistory.push(layer.toJSON());
+            });
+          });
+
+          layer.find('Line').forEach((line) => {
+            line.on('mouseover', function () {
+                document.body.style.cursor = 'move';
+            });
+
+            line.on('mouseleave', function () {
+                document.body.style.cursor = 'default';
+            });
+
+            line.on('transformend', function () { // Handles resizing of element (not positioning or visual attribute editing though)
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+              redoHistory.push(layer.toJSON());
+            });
+
+            line.on('dragend', function () {
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+              redoHistory.push(layer.toJSON());
+            });
+          });
+
+          layer.find('Star').forEach((star) => {
+            star.on('mouseover', function () {
+                document.body.style.cursor = 'move';
+            });
+
+            star.on('mouseleave', function () {
+                document.body.style.cursor = 'default';
+            });
+
+            star.on('transformend', function () { // Handles resizing of element (not positioning or visual attribute editing though)
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+              redoHistory.push(layer.toJSON());
+            });
+
+            star.on('dragend', function () {
+              currentAnnotation.changes.push(layer.toJSON()); // after change
+              redoHistory.push(layer.toJSON());
+            });
+          });
+        }
+
+
+        // Dropdown list jQuery event listeners
+        $(document).click(function (e) {
+          if (!$(e.target).is('#add-shape, #add-shape*') && $('#shapeDropdownList').css('display') !== 'none') {
+            $('#shapeDropdownList').css('display', 'none');
+          } else if (!$(e.target).is('#edit-font-family, #edit-font-family*') && $('#fontFamilyDropdownList').css('display') !== 'none') {
+            $('#fontFamilyDropdownList').css('display', 'none');
+          } else if (!$(e.target).is('#edit-font-style, #edit-font-style*') && $('#fontStyleDropdownList').css('display') !== 'none') {
+            $('#fontStyleDropdownList').css('display', 'none');
+          } else if (!$(e.target).is('#edit-stroke-color, #edit-stroke-color*') && $('#strokeColorDropdownList').css('display') !== 'none') {
+            $('#strokeColorDropdownList').css('display', 'none');
+          } else if (!$(e.target).is('#edit-stroke-width, #edit-stroke-width*') && $('#strokeWidthDropdownList').css('display') !== 'none') {
+            $('#strokeWidthDropdownList').css('display', 'none');
+          } else if (!$(e.target).is('#edit-fill-color, #edit-fill-color*') && $('#fillColorDropdownList').css('display') !== 'none') {
+            $('#fillColorDropdownList').css('display', 'none');
+          } else if (!$(e.target).is('#edit-opacity, #edit-opacity*') && $('#opacityDropdownList').css('display') !== 'none') {
+            $('#opacityDropdownList').css('display', 'none');
+          }
+        });
+        document.getElementById("shapeDropdownList").style.display = "none";
+
+        // On hover jQuery listeners
+        $(".annotation-instance-ribbon-button").mouseover(
+          function() {
+            $(this).css("color", "#f77062");
+          }
+        );
+        $(".annotation-instance-ribbon-button").mouseleave(
+          function() {
+            $(this).css("color", "white");
+          }
+        );
+        $("#add-new-annotation-button").mouseover(
+          function() {
+            $(this).css("color", "#f77062");
+          }
+        );
+        $("#add-new-annotation-button").mouseleave(
+          function() {
+            $(this).css("color", "white");
+          }
+        );
+        $("#filter-to-all-my-annotations-button").mouseover(
+          function() {
+            $(this).css("color", "#f77062");
+          }
+        );
+        $("#filter-to-all-my-annotations-button").mouseleave(
+          function() {
+            $(this).css("color", "white");
+          }
+        );
+
+        // getData();
+        </script>
+    </body>
+</html>
