@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Shared Annotations</title>
+        <link rel="stylesheet" href="stylesPP.css">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css" integrity="sha384-3B6NwesSXE7YJlcLI9RpRqGf2p/EgVH8BgoKTaUrmKNDkHPStTQ3EyoYjCGXaOTS" crossorigin="anonymous">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;700&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <!-- Hero Sections-->
+        <div class="main">
+            <div class="main__container">
+                <div class="main__content">
+                    <h1>My Profile</h1>
+                </div>
+            </div>
+        </div>
+        <!--Services Section-->
+        <div class="services">
+            <h1>Your Information</h1>
+            <div class="services__container">
+                <form id="user-info-form">
+                    <input type="text" name="username" id="username-field" class="login-form-field" placeholder="Username">
+                    <input type="password" name="About me" id="password-field" class="login-form-field" placeholder="Password">
+                    <input type="submit" value="Confirm" id="user-info-form-submit">
+                  </form>
+            </div>
+            <div class="About__me">
+                <h1>About Me</h1>
+                <form id="About__me">
+                    <input type="text" name="About Me" id="About me" class="About__me-field" placeholder="Write About Yourself">
+                    <input type="submit" value="Save" id="about-me-form-submit">
+                </form>
+            </div>
+        </div>
+    </body>
+
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js"></script>
+    <script id="firebase" type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js";
+      // TODO: Add SDKs for Firebase products that you want to use
+      // https://firebase.google.com/docs/web/setup#available-libraries
+
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyCHwSE4QWh7awhGmHK4kDu2BEiAErlVl9g",
+        authDomain: "project-7021442167418615245.firebaseapp.com",
+        databaseURL: "https://project-7021442167418615245-default-rtdb.firebaseio.com",
+        projectId: "project-7021442167418615245",
+        storageBucket: "project-7021442167418615245.appspot.com",
+        messagingSenderId: "1061474026436",
+        appId: "1:1061474026436:web:259eb58e32444235e75a91"
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+
+      import { getDatabase, ref, set, get, child, update, remove, push } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js";
+      import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-auth.js";
+      const db = getDatabase();
+
+      getAuth().onAuthStateChanged((user) => {
+        if (user) {
+          // User logged in already or has just logged in.
+          console.log(user.uid);
+          var signUpBool = sessionStorage.getItem("signUp");
+          if (signUpBool === "True") { // Process is only executed if they came from the sign Up page successfully.
+
+            // Creates new user's data
+            let Book = class {
+                constructor(pdf, name, author, pubYear, bookmarks, annotations) {
+                    this.pdf = pdf;
+                    this.name = name;
+                    this.author = author;
+                    this.pubYear = pubYear;
+                    this.bookmarks = bookmarks;
+                    this.annotations = annotations;
+                }
+            };
+
+            let b = new Book('Manual-English.pdf', 'Intopia Manual', 'Tim Jones', '1900', '', '');
+
+            let key = getAuth().currentUser.uid; // This is not updated by a new sign in
+            push(ref(db, "Users"), {
+              id : key,
+              books : [b]
+            })
+            .then(()=>{
+              sessionStorage.setItem("signUp", "False"); // Resets the sessionStorage data to False, prevents duplication in realtime database
+              alert('Data stored succesfully');
+            })
+            .catch((error)=>{
+              alert('Error: ' + error)
+            });
+          }
+        } else {
+          // User not logged in or has just logged out.
+          console.log('Logged out on page load');
+        }
+      });
+    </script>
+</html>

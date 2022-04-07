@@ -1,0 +1,70 @@
+body {
+  background-color: #141414;
+}
+
+.fa-regular {
+  pointer-events: none;
+}
+
+.navbar__links {
+  cursor: pointer;
+}
+
+.main__container {
+  height: 30px;
+}
+
+.main {
+  height: 200px;
+}
+
+#message1, #message2 {
+  color: white;
+  font-size: 14px;
+}
+
+#books-main-container {
+  height:200px;
+  margin-top: 150px;
+}
+
+#my-books-header {
+  color: white;
+}
+
+.input-label {
+  color: white;
+  margin-right: 3px;
+}
+
+.form-item-container {
+  display: flex;
+  padding: 5px;
+}
+
+#form-main-container {
+  margin-top: 60px;
+}
+
+#seperator {
+  border-bottom-color: white;
+  border-bottom-style: solid;
+  border-width: medium;
+  margin-bottom: 15px;
+}
+
+.main__container {
+  display: block;
+}
+
+.grid-item {
+  margin: 5px;
+}
+
+.book-name-container {
+  text-align: center;
+}
+
+.book-name {
+  color: white;
+}

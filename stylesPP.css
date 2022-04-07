@@ -1,0 +1,264 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Kumbh Sans', sans-serif;
+}
+
+.button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    padding: 10px 20px;
+    height: 100%;
+    width:100%;
+    border: none;
+    outline: none;
+    border-radius: 4px;
+    background: #f77062;
+    color: white;
+}
+
+/* Hero Section CSS*/
+body {
+  background-color: #141414;
+}
+
+.main {
+    background-color: #141414;
+    margin: 20px;
+}
+
+.main__container{
+    display: grid;
+    align-items: center;
+    justify-self: center;
+    margin: 0px auto;
+    background-color: #141414;
+    z-index: 1;
+    width: 100%;
+    max-width: 1300px;
+    padding: 0 50px;
+    text-align: center;
+}
+
+.main__content h1 {
+    font-size: 4rem;
+    background-color: #ff8177;
+    background-image: #fff;
+    background-size: 100%;
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -moz-text-fill-color: transparent;
+    text-align: center;
+    align-items: center;
+}
+
+.main__content h2 {
+    font-size: 4rem;
+    background-image: #fff;
+    background-size: 100%;
+    text-align: center;
+}
+
+.main__content p {
+    margin-top: 1rem;
+    font-size: 2rem;
+    font-weight: 400700;
+    color: white;
+}
+
+.main__btn {
+    font-size: 1rem;
+    background-image: linear-gradient(to top, #f77062 0%, #fe5196 100%);
+    padding: 14px 32px;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    margin-top: 2rem;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s;
+    outline: none;
+}
+
+.main__btn a {
+    position:relative;
+    z-index: 2;
+    color: #fff;
+    text-decoration: none;
+
+}
+
+.main__btn:after{
+    position: absolute;
+    content: '';
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background: #4837ff;
+    transition: all 0.3s;
+    border-radius: 4px;
+
+}
+
+.main__btn:hover {
+    color: #fff;
+}
+
+.main__btn:hover:after{
+    width: 100%;
+}
+
+.main__img--container {
+    text-align: center;
+}
+
+#main__img {
+    height: 80%;
+    width: 80%;
+}
+
+/* Service Section CSS*/
+
+.services {
+    background: #141414;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 200vh;
+    color: #fff;
+
+}
+
+.services__main {
+    background: #141414;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+}
+
+
+
+
+.services__container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+
+
+
+
+
+.services h2 {
+    position: absolute;
+    top: 350px;
+    left: 30px;
+}
+
+.services__card p {
+    position: absolute;
+    top: 400px;
+    left: 30px;
+
+}
+
+.services__card button {
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    outline: none;
+    border-radius: 4px;
+    background: #f77062;
+    top: 440px;
+    left: 30px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+
+
+  /* White rectangle in the middle of the screen */
+
+  #main-holder {
+    width: 50%;
+    height: 70%;
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    background-color: white;
+    border-radius: 7px;
+    box-shadow: 0px 0px 5px 2px black;
+  }
+
+  /* -------------------------------------------------------------- */
+
+
+
+  /* -------------------------------------------------------------- */
+
+  /* Middle row of the main grid (contains the error message) */
+
+
+
+  /* Adjust the positioning of the login form inside the last row of the
+  main grid */
+
+  #login-form, #user-info-form {
+    align-self: flex-start;
+    display: grid;
+    justify-items: center;
+    align-items: center;
+  }
+
+  /* Style the login form fields' placeholders */
+  .About__me {
+    text-align: center;
+  }
+  .login-form-field::placeholder {
+    color: #3a3a3a;
+  }
+
+  /* Style the login form fields (username and password) */
+
+  .login-form-field {
+    border: none;
+    border-bottom: 1px solid #3a3a3a;
+    margin-bottom: 10px;
+    border-radius: 3px;
+    outline: none;
+    padding: 0px 0px 5px 5px;
+  }
+
+  .About__me-field {
+    margin-top: 2rem;
+    border: none;
+    border-bottom: 1px solid #3a3a3a;
+    margin-bottom: 10px;
+    border-radius: 20px;
+    outline: none;
+    padding: 50px 50px 50px 50px;
+    font-size:16px;
+    margin:5px;
+  }
+
+  /* Style the login button */
+
+  #login-form-submit, #about-me-form-submit, #user-info-form-submit {
+    width: 100%;
+    padding: 7px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    background-color: #3a3a3a;
+    cursor: pointer;
+    outline: none;
+    margin-bottom: 2rem;
+  }

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Shared Annotations - Library</title>
+        <link rel="stylesheet" href="styles.css">
+        <link rel="stylesheet" href="library-page.css">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css" integrity="sha384-3B6NwesSXE7YJlcLI9RpRqGf2p/EgVH8BgoKTaUrmKNDkHPStTQ3EyoYjCGXaOTS" crossorigin="anonymous">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fnts.googleapis.com/css2?family=Kumbh+Sans:wght@400;700&display=swap" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.7.570/build/pdf.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+            integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <link href="./filepond.css" rel="stylesheet" />
+    </head>
+    <body>
+        <!-- Navbar Sections-->
+        <nav class="navbar">
+            <div class="navbar__container">
+                <div class="main__content">
+                    <h1>Library</h1>
+                    <button id="btnUploading" class="main__btn" style="margin-top: 10px;"><a>Upload</a></button>
+                    <p id="message1">Drag & Drop does not work.</p>
+                    <p id="message2">Please click to upload a pdf file only.</p>
+                </div>
+                <a href="" id="navbar__logo"><i class="fa-regular fa-note-sticky"></i> Shared Annotations</a>
+                <ul class="navbar__menu">
+                    <li class="navbar__item">
+                      <span id="sign-out-button" class="navbar__links">Sign Out</span></li>
+                </ul>
+            </div>
+        </nav>
+        <div id="form-main-container">
+          <div class="main__container">
+            <div id="form-container">
+              <div class="form-item-container">
+                <label for="book-input-name" class='input-label'>Book Name</label>
+                <input id="book-input-name" type="text">
+              </div>
+              <div class="form-item-container">
+                <label for="book-input-author" class='input-label'>Book Author</label>
+                <input id="book-input-author" type="text">
+              </div>
+              <div class="form-item-container">
+                <label for="book-input-year" class='input-label'>Book Publication Year</label>
+                <input id="book-input-year" type="number">
+              </div>
+              <div class="form-item-container">
+                <button id="btnContinuing" class="main__btn" style="margin-top: 10px;"><a>Continue</a></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <input id="add-pdf" accept=".pdf" type="file" />
+
+        <div id="books-main-container">
+          <div class="main__container">
+            <div class="main__content">
+              <h3 id="my-books-header">My Books</h3>
+            </div>
+
+            <div id="seperator"></div>
+            <div id="books-container">
+              <div id="books-subcontainer"></div>
+            </div>
+          </div>
+        </div>
+        <script type="module">
+          // Import the functions you need from the SDKs you need
+          import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js";
+          // TODO: Add SDKs for Firebase products that you want to use
+          // https://firebase.google.com/docs/web/setup#available-libraries
+
+          // Your web app's Firebase configuration
+          const firebaseConfig = {
+            apiKey: "AIzaSyCHwSE4QWh7awhGmHK4kDu2BEiAErlVl9g",
+            authDomain: "project-7021442167418615245.firebaseapp.com",
+            databaseURL: "https://project-7021442167418615245-default-rtdb.firebaseio.com",
+            projectId: "project-7021442167418615245",
+            storageBucket: "project-7021442167418615245.appspot.com",
+            messagingSenderId: "1061474026436",
+            appId: "1:1061474026436:web:259eb58e32444235e75a91"
+          };
+
+          // Initialize Firebase
+          const app = initializeApp(firebaseConfig);
+
+          import { getDatabase, ref, set, get, child, update, remove, push } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js";
+          import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-auth.js";
+
+          const db = getDatabase();
+          const auth = getAuth();
+          var userId = null;
+          var userKey = null;
+
+          var pulledUsername = sessionStorage.getItem("username");
+
+          var $ = jQuery;
+
+          let Book = class {
+              constructor(pdf, name, author, pubYear, bookmarks, annotations) {
+                  this.pdf = pdf;
+                  this.name = name;
+                  this.author = author;
+                  this.pubYear = pubYear;
+                  this.bookmarks = bookmarks;
+                  this.annotations = annotations;
+              }
+          };
+
+          getAuth().onAuthStateChanged((user) => {
+            if (user) {
+              // User logged in already or has just logged in
+              userId = getAuth().currentUser.uid;
+              var signUpBool = sessionStorage.getItem("signUp");
+              if (signUpBool === "True") { // Process is only executed if they came from the sign Up page successfully.
+                // Creates new user's data
+                let b = new Book('Dummy', 'Assignment 5 - Usability Evaluation', 'Luke Russell', '2022', '', '');
+
+                let key = getAuth().currentUser.uid; // This is not updated by a new sign in
+                push(ref(db, "Users"), {
+                  id : key,
+                  username : pulledUsername,
+                  books : [b]
+                })
+                .then(()=>{
+                  sessionStorage.setItem("signUp", "False"); // Resets the sessionStorage data to False, prevents duplication in realtime database
+                  getBooks(getAuth().currentUser.uid);
+                  // alert('Data stored succesfully');
+                })
+                .catch((error) => {
+                  alert('Error: ' + error);
+                });
+              } else {
+                getBooks(getAuth().currentUser.uid);
+              }
+            } else {
+              // User not logged in or has just logged out.
+              sessionStorage.clear();
+              window.location.href = 'login-page.html';
+            }
+          });
+
+          document.getElementById("add-pdf").addEventListener('change', (event) => {
+            const fileList = event.target.files;
+            var file = fileList[0];
+            var fileReader = new FileReader();
+            let src;
+            fileReader.onload = function (e) {
+                src = e.target.result;
+                addBooks(src);
+            };
+            fileReader.readAsDataURL(file);
+          });
+
+          function addBooks(pdf) {
+            let newBook = new Book(pdf, document.getElementById('book-input-name').value, document.getElementById('book-input-author').value, document.getElementById('book-input-year').value, '', '');
+            books.push(newBook);
+            set(ref(db, "Users/" + userKey), {
+              books: books,
+              username : pulledUsername,
+              id: userId
+            })
+            .then(()=> {
+              document.getElementById('book-grid-container').remove();
+              createBookGrid();
+              let divUploadContainers = document.getElementsByClassName('filepond--root');
+              Array.from(divUploadContainers).forEach(function (element) {
+                element.style.display = 'none';
+                element.style.height = "76px";
+              });
+              document.getElementById('form-main-container').style.display = 'none';
+              document.getElementById('book-input-name').value = "";
+              document.getElementById('book-input-year').value = "";
+              document.getElementById('book-input-author').value = "";
+              document.getElementById('message1').style.display = 'block';
+              document.getElementById('message2').style.display = 'block';
+            })
+            .catch((error)=>{
+              alert('Error: ' + error);
+            });
+          }
+
+          function logout() {
+            signOut(auth).then(() => {
+              sessionStorage.clear();
+              window.location.href = 'login-page.html';
+            }).catch((error) => {
+              alert('Error: ' + error);
+            });
+          }
+          document.getElementById('sign-out-button').addEventListener('click', logout);
+
+          var books = [];
+          function getBooks(id) {
+            var dbref = ref(db);
+            get(child(dbref, "Users")).then((snapshot) => {
+                snapshot.forEach(function(snap) {
+                  if (snap.val().id === id) {
+                    userKey = snap.key;
+                    let userBooks = snap.val().books;
+                    for (let k = 0; k < userBooks.length; k++) {
+                      if (userBooks[k].pdf !== 'Dummy') {
+                        books.push(userBooks[k]);
+                      }
+                    }
+                  }
+                });
+            }).then(()=> {
+              if (books !== []) {
+                createBookGrid();
+              }
+            })
+            .catch((error)=> {
+              alert('Error: ' + error);
+            });
+          }
+
+          function createBookGrid() {
+            var gridContainer = $('<div>', {
+                id: 'book-grid-container'
+            });
+
+            gridContainer.appendTo('#books-subcontainer');
+            document.getElementById('book-grid-container').style.display = 'flex';
+            document.getElementById('book-grid-container').style.display = '-webkit-box';
+            document.getElementById('book-grid-container').style.display = '-moz-box';
+            document.getElementById('book-grid-container').style.display = '-ms-flexbox';
+            document.getElementById('book-grid-container').style.display = '-moz-flex';
+            document.getElementById('book-grid-container').style.display = '-webkit-flex';
+            $('#book-grid-container').css('flex-wrap', 'wrap');
+
+            for (let i = 0; i < books.length; i++) {
+              let book = books[i];
+              pdfjsLib.getDocument(book.pdf).promise.then(function (pdfDoc_) {
+                var newStr = "";
+                if(book.name.length > 30) {
+                  for (let j = 0; j <= 18; j++) {
+                    newStr += book.name[j];
+                  }
+                  newStr += "..."
+                } else {
+                  for (let j = 0; j < book.name.length; j++) {
+                    newStr += book.name[j];
+                  }
+                }
+
+                var gridItem = $('<div>', {
+                  id: newStr,
+                  class: 'grid-item'
+                });
+
+                var canvasContainer = $('<div>', {
+                  id: i + 'canvas-container'
+                });
+
+                var canvas = $('<canvas>', {
+                  id: i + newStr
+                });
+
+                canvas.appendTo(canvasContainer);
+                canvasContainer.appendTo(gridItem);
+
+                var bookNameContainer = $('<div>', {
+                  class: 'book-name-container'
+                });
+
+                var bookName = $('<span>', {
+                  class: 'book-name'
+                });
+
+                bookName.text(newStr);
+                bookName.appendTo(bookNameContainer);
+                bookNameContainer.appendTo(gridItem);
+
+                gridItem.appendTo(gridContainer);
+
+                // Styling
+                $('#' + book.name).css("-webkit-flex-wrap", "wrap");
+                $('#' + book.name).css("flex-wrap", "wrap");
+                $('.book-name-container').css('display', 'block');
+                $('.book-name-container').css('width', '183px');
+
+                // PDF Loading Variables
+                var pdfDoc = null,
+                    pageRendering = false,
+                    pageNumPending = null,
+                    pageNum = 1,
+                    scale = 0.3,
+                    ctx = document.getElementById(i + newStr).getContext('2d');
+                  pdfDoc = pdfDoc_;
+
+                // Initial/first page rendering of PDF document
+                renderPage(pageNum, scale, pageRendering, ctx, pageNumPending, pdfDoc, i + newStr, i + 'canvas-container');
+
+
+                // Event Listeners
+                let bookPreviewContainers = document.getElementsByClassName('grid-item');
+                Array.from(bookPreviewContainers).forEach(function (element) {
+                    element.addEventListener('mouseover', function () {
+                        document.body.style.cursor = 'pointer';
+                    }, false)
+                });
+
+                Array.from(bookPreviewContainers).forEach(function (element) {
+                    element.addEventListener('mouseleave', function () {
+                        document.body.style.cursor = 'default';
+                    }, false)
+                });
+                document.getElementById(i + 'canvas-container').addEventListener('click', openPdfToAnnotationTool);
+              });
+            }
+          }
+
+          /**
+           * Get page info from document, resize canvas accordingly, and render page.
+           */
+          function renderPage(num, scale, pageRendering, ctx, pageNumPending, pdfDoc, canvasId, canvasContainerId) {
+              var canvas = document.getElementById(canvasId);
+              // Using promise to fetch the page
+              pdfDoc.getPage(num).then(function (page) {
+                  var viewport = page.getViewport({
+                      scale: scale
+                  });
+                  canvas.height = viewport.height;
+                  canvas.width = viewport.width;
+
+                  // Render PDF page into canvas context
+                  var renderContext = {
+                      canvasContext: ctx,
+                      viewport: viewport
+                  };
+                  var renderTask = page.render(renderContext);
+
+                  // Wait for rendering to finish
+                  renderTask.promise.then(function () {
+                      pageRendering = false;
+                      if (pageNumPending !== null) {
+                          // New page rendering is pending
+                          renderPage(pageNumPending);
+                          pageNumPending = null;
+                      }
+                      convertCanvasToImage(canvasId, canvasContainerId);
+                  });
+              });
+          }
+
+          function convertCanvasToImage(canvasId, canvasContainerId) {
+            let canvas = document.getElementById(canvasId);
+            let image = new Image();
+            image.src = canvas.toDataURL();
+            var imageTag = $('<img>', {
+              id: canvasId,
+              src: image.src
+            });
+            imageTag.appendTo($('#' + canvasContainerId));
+            canvas.remove();
+          }
+
+          function toggleUpload() {
+            let divUploadContainers = document.getElementsByClassName('filepond--root');
+            Array.from(divUploadContainers).forEach(function (element) {
+                if (element.style.display === 'none') {
+                  if (document.getElementById('book-input-name').value === '') {
+                    alert('Please enter a book name');
+                    return;
+                  } else if (document.getElementById('book-input-author').value === '') {
+                    alert('Please enter an author');
+                    return;
+                  } else if (document.getElementById('book-input-year').value === '') {
+                    alert('Please enter a publication year');
+                    return;
+                  } else {
+                    element.style.display = 'block';
+                  }
+                } else {
+                  element.style.display = 'none';
+                }
+            });
+          }
+          document.getElementById('btnUploading').addEventListener('click', toggleForm);
+          let divUploadContainers = document.getElementsByClassName('filepond--root');
+          Array.from(divUploadContainers).forEach(function (element) {
+            element.style.display = 'none';
+            element.style.height = "76px";
+            element.style.margin = "130px";
+          });
+
+          function toggleForm() {
+            if (document.getElementById('form-main-container').style.display === 'none') {
+              document.getElementById('form-main-container').style.display = 'block';
+              document.getElementById('message2').style.display = 'none';
+              document.getElementById('message1').style.display = 'none';
+            } else {
+              document.getElementById('form-main-container').style.display = 'none';
+              document.getElementById('book-input-name').value = "";
+              document.getElementById('book-input-year').value = "";
+              document.getElementById('book-input-author').value = "";
+              document.getElementById('message1').style.display = 'block';
+              document.getElementById('message2').style.display = 'block';
+            }
+          }
+          document.getElementById('form-main-container').style.display = 'none';
+          document.getElementById('btnContinuing').addEventListener('click', toggleUpload);
+
+          function openPdfToAnnotationTool(e) {
+            sessionStorage.setItem("bookIndex", retrieveIndexFromBook(e.target.id));
+            window.location.href = 'annotationtool-page.html';
+          }
+
+          function retrieveIndexFromBook(id) {
+            let arrayIndex = '';
+            for (let i = 0; i < id.length; i++) {
+                if (!isNaN(id[i])) {
+                    arrayIndex = arrayIndex + id[i];
+                }
+            }
+            return arrayIndex;
+          }
+        </script>
+        <script>
+            // prettier-ignore
+            [
+        {supported: 'Symbol' in window, fill: 'https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser-polyfill.min.js'},
+        {supported: 'Promise' in window, fill: 'https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js'},
+        {supported: 'fetch' in window, fill: 'https://cdn.jsdelivr.net/npm/fetch-polyfill@0.8.2/fetch.min.js'},
+        {supported: 'CustomEvent' in window && 'log10' in Math && 'sign' in Math &&  'assign' in Object &&  'from' in Array &&
+                    ['find', 'findIndex', 'some', 'includes'].reduce(function(previous, prop) { return (prop in Array.prototype) ? previous : false; }, true), fill: 'https://unpkg.com/filepond-polyfill/dist/filepond-polyfill.js'}
+    ].forEach(function(p) {
+        if (p.supported) return;
+        document.write('<script src="' + p.fill + '"><\/script>');
+    });
+        </script>
+
+        <script src="./filepond.js"></script>
+
+        <script>
+            // Get a reference to the file input element
+            const inputElement = document.querySelector('input[type="file"]');
+
+            // Create the FilePond instance
+            const pond = FilePond.create(inputElement, {
+                allowMultiple: true,
+                allowReorder: true,
+            });
+
+            // Easy console access for testing purposes
+            window.pond = pond;
+        </script>
+    </body>
+</html>

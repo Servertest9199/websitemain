@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shared Annotations - Sign Up</title>
+  <link rel="stylesheet" href="login-page.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css" integrity="sha384-3B6NwesSXE7YJlcLI9RpRqGf2p/EgVH8BgoKTaUrmKNDkHPStTQ3EyoYjCGXaOTS" crossorigin="anonymous">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fnts.googleapis.com/css2?family=Kumbh+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <script defer src="login-page.js"></script>
+</head>
+
+<body>
+  <main id="main-holder">
+    <a href="Frontpage.html" id="navbar__logo"><i class="fa-regular fa-note-sticky"></i> Shared Annotations</a>
+    <div id="login-error-msg-holder">
+      <p id="login-error-msg">Invalid username <span id="error-msg-second-line">and/or password</span></p>
+    </div>
+    <form id="login-form">
+      <input type="text" name="email" id="email-field" class="login-form-field" placeholder="Email">
+      <input type="password" name="password" id="password-field" class="login-form-field" placeholder="Password">
+      <div id="form-buttons-container">
+        <input type="submit" value="Sign Up" id="login-form-submit">
+        <input type="button" value="🗘" id="to-signup-page">
+      </div>
+    </form>
+
+  </main>
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js"></script>
+  <script id="firebase" type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCHwSE4QWh7awhGmHK4kDu2BEiAErlVl9g",
+      authDomain: "project-7021442167418615245.firebaseapp.com",
+      databaseURL: "https://project-7021442167418615245-default-rtdb.firebaseio.com",
+      projectId: "project-7021442167418615245",
+      storageBucket: "project-7021442167418615245.appspot.com",
+      messagingSenderId: "1061474026436",
+      appId: "1:1061474026436:web:259eb58e32444235e75a91"
+    };
+
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+
+    import { getDatabase, ref, child, set, push} from "https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-auth.js";
+    const db = getDatabase();
+    const auth = getAuth();
+
+    const email = document.getElementById("email-field");
+    email.value = "";
+    const password = document.getElementById("password-field");
+    password.value = "";
+
+    sessionStorage.clear();
+
+    function validateInputFields() {
+      if (email.value === "") {
+        alert("Please enter a valid email");
+        return false;
+      } else if (password.value === "") {
+        alert("Please enter a valid password");
+        return false;
+      } else if (password.value.length <= 5) {
+        alert("Password must be at least 6 characters long");
+        return false;
+      } else if (isUpper(password.value) === false) {
+        alert("Password must contain at least 1 upper case letter");
+        return false;
+      } else if (hasNumber(password.value) === false) {
+        alert("Password must contain at least 1 number");
+        return false;
+      } else if (containsSpecialChars(password.value) !== true) {
+        alert("Password must contain at least special character");
+        return false;
+      }
+      return true;
+    }
+
+    function isUpper(str) {
+      return /[A-Z]/.test(str);
+    }
+
+    function hasNumber(str) {
+      for( let i = 0; i < str.length; i++){
+        if(!isNaN(str.charAt(i)) && !(str.charAt(i) === " ") ){
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function containsSpecialChars(str) {
+      const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+      return specialChars.test(str);
+    }
+
+    function getUsername(email) {
+      var newUsername = "";
+      for (let o = 0; o < email.length; o++) {
+        if (email[o] === "@") {
+          break;
+        } else {
+          newUsername += email[o]
+        }
+      }
+      return newUsername;
+    }
+
+    // Ensures no other user is logged in on page load
+    getAuth().updateCurrentUser();
+
+    function signUp() {
+      if (validateInputFields() === false) {
+        return;
+      }
+
+      var userEmail = document.getElementById("email-field").value;
+      var userPass = document.getElementById("password-field").value;
+
+      createUserWithEmailAndPassword(auth, userEmail, userPass).then((userCredential) => {
+        const user = userCredential.user;
+        signInWithEmailAndPassword(auth, userEmail, userPass).then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          sessionStorage.setItem("signUp", "True");
+          sessionStorage.setItem("username", getUsername(userEmail));
+          window.location.href = 'library-page.html';
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          alert(errorMessage);
+        });
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        alert(errorMessage);
+      });
+    }
+    document.getElementById('login-form-submit').addEventListener('click', signUp);
+
+    function toggleLoginSignUp() {
+      sessionStorage.clear();
+      window.location.href = 'login-page.html';
+    }
+    document.getElementById('to-signup-page').addEventListener('click', toggleLoginSignUp);
+  </script>
+</body>
+</html>
